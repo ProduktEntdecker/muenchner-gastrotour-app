@@ -121,7 +121,7 @@ export default function EventsPage() {
       <h1 style={{ marginBottom: '32px' }}>🍽️ Gastrotour Events</h1>
 
       {upcomingEvents.length === 0 && (
-        <div style={{
+        <div data-testid="no-events" style={{
           padding: '40px',
           background: '#f8f9fa',
           borderRadius: '12px',
@@ -143,6 +143,7 @@ export default function EventsPage() {
               <div
                 key={event.id}
                 className="card"
+                data-testid="event-card"
                 style={{
                   padding: '24px',
                   border: event.seatsAvailable === 0 ? '2px solid #dc3545' : '1px solid #e5e7eb'
@@ -150,11 +151,11 @@ export default function EventsPage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '16px' }}>
                   <div style={{ flex: 1, minWidth: '250px' }}>
-                    <h3 style={{ marginBottom: '8px', fontSize: '24px' }}>{event.name}</h3>
-                    <p style={{ color: '#666', marginBottom: '16px' }}>
+                    <h3 data-testid="event-name" style={{ marginBottom: '8px', fontSize: '24px' }}>{event.name}</h3>
+                    <p data-testid="event-date" style={{ color: '#666', marginBottom: '16px' }}>
                       📅 {formatDate(event.date)}
                     </p>
-                    <p style={{ marginBottom: '8px' }}>
+                    <p data-testid="event-address" style={{ marginBottom: '8px' }}>
                       📍 {event.address}
                     </p>
                     {event.description && (
@@ -181,7 +182,7 @@ export default function EventsPage() {
                     background: '#f8f9fa',
                     borderRadius: '8px'
                   }}>
-                    <div style={{
+                    <div data-testid="seats-available" style={{
                       fontSize: '32px',
                       fontWeight: 'bold',
                       color: event.seatsAvailable === 0 ? '#dc3545' : '#28a745',
