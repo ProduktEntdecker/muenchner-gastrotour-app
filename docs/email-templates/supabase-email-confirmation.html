@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Mail bestätigen - Münchner Gastrotour</title>
+</head>
+<body style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; margin: 0; padding: 0; background-color: #f9fafb;">
+    <div style="max-width: 600px; margin: 0 auto; background-color: white; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
+        <!-- Header -->
+        <div style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); padding: 30px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 24px;">🍽️ Münchner Gastrotour</h1>
+            <p style="color: rgba(255,255,255,0.9); margin: 8px 0 0 0; font-size: 16px;">Willkommen in München's Genusswelt</p>
+        </div>
+        
+        <!-- Content -->
+        <div style="padding: 40px 30px;">
+            <h2 style="color: #1f2937; margin: 0 0 20px 0; font-size: 22px;">Fast geschafft! ✨</h2>
+            
+            <p style="color: #4b5563; margin-bottom: 24px; font-size: 16px;">
+                Vielen Dank für deine Registrierung bei der Münchner Gastrotour! 
+                Um dein Konto zu aktivieren, bestätige einfach deine E-Mail-Adresse.
+            </p>
+            
+            <!-- CTA Button -->
+            <div style="text-align: center; margin: 35px 0;">
+                <a href="{{ .ConfirmationURL }}" 
+                   style="display: inline-block; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); 
+                          color: white; padding: 14px 32px; text-decoration: none; border-radius: 8px; 
+                          font-weight: 600; font-size: 16px; box-shadow: 0 4px 14px rgba(59, 130, 246, 0.4);">
+                    ✅ E-Mail-Adresse bestätigen
+                </a>
+            </div>
+            
+            <div style="background-color: #f3f4f6; border-left: 4px solid #3b82f6; padding: 16px; margin: 24px 0; border-radius: 4px;">
+                <p style="margin: 0; color: #374151; font-size: 14px;">
+                    <strong>Wichtig:</strong> Dieser Link ist 24 Stunden gültig. 
+                    Falls der Button nicht funktioniert, kopiere diesen Link in deinen Browser:<br>
+                    <span style="font-family: monospace; background: #e5e7eb; padding: 2px 6px; border-radius: 3px; font-size: 12px; word-break: break-all;">{{ .ConfirmationURL }}</span>
+                </p>
+            </div>
+            
+            <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
+                Nach der Bestätigung kannst du:
+            </p>
+            <ul style="color: #6b7280; font-size: 14px; padding-left: 20px;">
+                <li>An exklusiven Gastro-Events teilnehmen</li>
+                <li>Neue Restaurants in München entdecken</li>
+                <li>Mit anderen Foodies vernetzen</li>
+                <li>Deine kulinarischen Erlebnisse teilen</li>
+            </ul>
+            
+            <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
+            
+            <p style="color: #9ca3af; font-size: 13px; text-align: center; margin: 0;">
+                Du erhältst diese E-Mail, weil du dich bei der Münchner Gastrotour registriert hast.<br>
+                Falls du dich nicht registriert hast, ignoriere diese E-Mail einfach.
+            </p>
+        </div>
+        
+        <!-- Footer -->
+        <div style="background-color: #f9fafb; padding: 20px 30px; border-top: 1px solid #e5e7eb; text-align: center;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0;">
+                © 2025 Münchner Gastrotour | München, Deutschland<br>
+                Fragen? Schreib uns an <a href="mailto:info@muenchner-gastrotour.de" style="color: #3b82f6; text-decoration: none;">info@muenchner-gastrotour.de</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>
