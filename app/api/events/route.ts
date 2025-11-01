@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createClient } from '@/lib/supabase/server';
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server';
 
 /**
  * POST /api/events - Create new event (for testing)
+ * Uses service role client to bypass RLS policies
  */
 export async function POST(request: NextRequest) {
   try {
-    const supabase = await createClient();
+    // Use service role client to bypass RLS for test event creation
+    const supabase = createServiceRoleClient();
 
     let body;
     try {

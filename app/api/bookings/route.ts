@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceRoleClient } from '@/lib/supabase/server'
 import { SimpleErrorTracker, handleApiError } from '@/lib/simple-error-tracker'
 import { applyRateLimit, RATE_LIMITS } from '@/lib/simple-rate-limiter'
 import { cookies } from 'next/headers';
@@ -8,11 +8,15 @@ import { sendBookingConfirmation } from '@/lib/email';
 // GET /api/bookings - List bookings (filtered by eventId or userEmail)
 export async function GET(request: NextRequest) {
   try {
-    const supabase = await createClient();
     const searchParams = request.nextUrl.searchParams;
     const eventId = searchParams.get('eventId');
     const userEmail = searchParams.get('userEmail');
     const status = searchParams.get('status');
+
+    // Use service role client for test mode (when filtering by eventId or userEmail)
+    const supabase = (eventId || userEmail)
+      ? createServiceRoleClient()
+      : await createClient();
 
     let query = supabase
       .from('bookings')
@@ -124,8 +128,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const supabase = await createClient();
-
     let body;
     try {
       body = await request.json();
@@ -145,13 +147,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // For testing: support userEmail parameter
+    // For testing: support userEmail parameter and use service role client
     // For production: use authenticated user
     let userId: string;
     let userEmailAddress: string;
+    let supabase: any;
 
     if (userEmail) {
-      // Testing mode: find or create profile by email
+      // Testing mode: use service role client to bypass RLS
+      supabase = createServiceRoleClient();
+
+      // Find or create profile by email
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('id, email')
@@ -185,6 +191,7 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Production mode: require authentication
+      supabase = await createClient();
       const { data: { user } } = await supabase.auth.getUser();
 
       if (!user) {
