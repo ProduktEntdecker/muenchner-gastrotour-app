@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
         host_counts_as_seat,
         status,
         created_at,
+        cuisine_type,
         bookings!bookings_event_id_fkey(
           id,
           user_id,
@@ -84,6 +85,7 @@ export async function GET(request: NextRequest) {
         maxSeats: event.max_seats,
         seatsAvailable: Math.max(0, event.max_seats - seatsTaken),
         seatsTaken: seatsTaken,
+        cuisineType: event.cuisine_type,
         attendees: confirmedBookings.map(b => ({
           id: (b.profiles as any)?.id || b.user_id,
           name: (b.profiles as any)?.full_name || 'Unknown'

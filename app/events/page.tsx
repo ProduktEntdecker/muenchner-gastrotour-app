@@ -15,6 +15,7 @@ interface Event {
   seatsAvailable: number
   seatsTaken: number
   attendees: { id: number; name: string }[]
+  cuisineType?: string
 }
 
 export default function EventsPage() {
@@ -23,6 +24,7 @@ export default function EventsPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [bookingStatus, setBookingStatus] = useState<{ [key: number]: string }>({})
+  const [cuisineFilter, setCuisineFilter] = useState<string>('all')
 
   useEffect(() => {
     fetchEvents()
@@ -113,12 +115,46 @@ export default function EventsPage() {
     )
   }
 
-  const upcomingEvents = events.filter(e => !isEventPast(e.date))
+  const upcomingEvents = events
+    .filter(e => !isEventPast(e.date))
+    .filter(e => cuisineFilter === 'all' || e.cuisineType === cuisineFilter)
   const pastEvents = events.filter(e => isEventPast(e.date))
+
+  // Get unique cuisine types from events
+  const cuisineTypes = Array.from(new Set(events.map(e => e.cuisineType).filter(Boolean)))
+    .sort()
 
   return (
     <div className="container" style={{ padding: '40px 20px' }}>
       <h1 style={{ marginBottom: '32px' }}>🍽️ Gastrotour Events</h1>
+
+      {cuisineTypes.length > 0 && (
+        <div style={{ marginBottom: '32px' }}>
+          <label htmlFor="cuisine-filter" style={{ marginRight: '12px', fontWeight: '500' }}>
+            Küche filtern:
+          </label>
+          <select
+            id="cuisine-filter"
+            data-testid="cuisine-filter"
+            value={cuisineFilter}
+            onChange={(e) => setCuisineFilter(e.target.value)}
+            style={{
+              padding: '8px 16px',
+              borderRadius: '8px',
+              border: '1px solid #e5e7eb',
+              fontSize: '16px',
+              cursor: 'pointer'
+            }}
+          >
+            <option value="all">Alle Küchen</option>
+            {cuisineTypes.map(cuisine => (
+              <option key={cuisine} value={cuisine}>
+                {cuisine}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       {upcomingEvents.length === 0 && (
         <div data-testid="no-events" style={{
@@ -151,7 +187,24 @@ export default function EventsPage() {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '16px' }}>
                   <div style={{ flex: 1, minWidth: '250px' }}>
-                    <h3 data-testid="event-name" style={{ marginBottom: '8px', fontSize: '24px' }}>{event.name}</h3>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
+                      <h3 data-testid="event-name" style={{ fontSize: '24px', margin: 0 }}>{event.name}</h3>
+                      {event.cuisineType && (
+                        <span
+                          data-testid="cuisine-badge"
+                          style={{
+                            padding: '4px 12px',
+                            background: '#e3f2fd',
+                            color: '#1976d2',
+                            borderRadius: '16px',
+                            fontSize: '14px',
+                            fontWeight: '500'
+                          }}
+                        >
+                          {event.cuisineType}
+                        </span>
+                      )}
+                    </div>
                     <p data-testid="event-date" style={{ color: '#666', marginBottom: '16px' }}>
                       📅 {formatDate(event.date)}
                     </p>
