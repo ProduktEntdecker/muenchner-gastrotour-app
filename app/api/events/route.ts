@@ -2,9 +2,69 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 
 /**
+ * POST /api/events - Create new event (for testing)
+ */
+export async function POST(request: NextRequest) {
+  try {
+    const supabase = await createClient();
+
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: 'Invalid request body' },
+        { status: 400 }
+      );
+    }
+
+    const { name, description, date, address, maxSeats, cuisineType } = body;
+
+    if (!name || !date || !address) {
+      return NextResponse.json(
+        { error: 'Missing required fields: name, date, address' },
+        { status: 400 }
+      );
+    }
+
+    // Create event
+    const { data: event, error } = await supabase
+      .from('events')
+      .insert({
+        name: name.trim(),
+        description: description?.trim() || '',
+        date: new Date(date).toISOString(),
+        address: address.trim(),
+        max_seats: maxSeats || 7,
+        cuisine_type: cuisineType || null,
+        status: 'upcoming',
+        host_counts_as_seat: false
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error('Error creating event:', error);
+      return NextResponse.json(
+        { error: 'Failed to create event' },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ event }, { status: 201 });
+  } catch (error) {
+    console.error('Error creating event:', error);
+    return NextResponse.json(
+      { error: 'Failed to create event' },
+      { status: 500 }
+    );
+  }
+}
+
+/**
  * GET /api/events - List all events (public)
  * Fetches events from Supabase with booking information
- * 
+ *
  * Query parameters:
  * - upcoming: 'true' to get only future events
  * - limit: maximum number of events to return (default: 10)

@@ -49,10 +49,15 @@ export async function GET(
       userBooking = event.bookings?.find((b: any) => b.user_id === user.id);
     }
 
+    // Calculate seat information
+    const seatsTaken = confirmedBookings.length;
+    const seatsAvailable = Math.max(0, (event.max_seats || 8) - seatsTaken);
+
     // Format response
     const response = {
       ...event,
-      seatsAvailable: Math.max(0, (event.max_seats || 8) - confirmedBookings.length),
+      seatsAvailable,
+      seatsTaken,
       attendees: confirmedBookings.map((b: any) => ({
         id: b.profiles?.id,
         name: b.profiles?.full_name || 'Anonymous',
@@ -69,7 +74,7 @@ export async function GET(
     // Remove raw bookings data from response
     delete response.bookings;
 
-    return NextResponse.json(response);
+    return NextResponse.json({ event: response });
   } catch (error) {
     console.error('Error fetching event:', error);
     return NextResponse.json(
