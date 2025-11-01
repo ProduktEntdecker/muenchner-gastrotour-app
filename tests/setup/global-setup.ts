@@ -6,27 +6,31 @@ import { chromium, FullConfig } from '@playwright/test'
  */
 async function globalSetup(config: FullConfig) {
   console.log('[Playwright] Global setup started')
-  
+
+  // Get base URL from config
+  const baseURL = config.projects[0]?.use?.baseURL || 'http://localhost:3001'
+  console.log(`[Playwright] Using base URL: ${baseURL}`)
+
   // Clean up any existing test data
   console.log('[Playwright] Cleaning test environment...')
-  
+
   // You can add database cleanup here if needed
   // await cleanTestDatabase()
-  
+
   // Create a test user for authentication tests
-  await createTestUser()
-  
+  await createTestUser(baseURL)
+
   console.log('[Playwright] Global setup completed')
 }
 
-async function createTestUser() {
+async function createTestUser(baseURL: string) {
   // Create a browser instance for setup
   const browser = await chromium.launch()
   const page = await browser.newPage()
-  
+
   try {
-    // Navigate to the registration page
-    await page.goto('http://localhost:3001/register')
+    // Navigate to the registration page using the base URL
+    await page.goto(`${baseURL}/register`)
     
     // Check if test user already exists by trying to register
     const testEmail = 'e2e-test@example.com'
