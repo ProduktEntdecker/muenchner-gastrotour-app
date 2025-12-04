@@ -125,12 +125,27 @@ export default function EventsPage() {
     .sort()
 
   return (
-    <div className="container" style={{ padding: '40px 20px' }}>
-      <h1 style={{ marginBottom: '32px' }}>🍽️ Gastrotour Events</h1>
+    <div className="container" style={{ padding: '60px 20px' }}>
+      <div className="section-header" style={{ marginBottom: '40px' }}>
+        <p className="tagline">Unsere Termine</p>
+        <h1 style={{ marginBottom: '12px' }}>Gastrotour Events</h1>
+        <div className="decorative-line"></div>
+      </div>
 
       {cuisineTypes.length > 0 && (
-        <div style={{ marginBottom: '32px' }}>
-          <label htmlFor="cuisine-filter" style={{ marginRight: '12px', fontWeight: '500' }}>
+        <div style={{ marginBottom: '40px' }}>
+          <label
+            htmlFor="cuisine-filter"
+            style={{
+              marginRight: '16px',
+              fontFamily: 'var(--font-ui)',
+              fontWeight: '500',
+              fontSize: '14px',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              color: 'var(--ink-soft)'
+            }}
+          >
             Küche filtern:
           </label>
           <select
@@ -139,11 +154,14 @@ export default function EventsPage() {
             value={cuisineFilter}
             onChange={(e) => setCuisineFilter(e.target.value)}
             style={{
-              padding: '8px 16px',
-              borderRadius: '8px',
-              border: '1px solid #e5e7eb',
-              fontSize: '16px',
-              cursor: 'pointer'
+              padding: '10px 20px',
+              borderRadius: 'var(--radius-sm)',
+              border: '1px solid var(--line)',
+              fontSize: '15px',
+              fontFamily: 'var(--font-body)',
+              cursor: 'pointer',
+              background: 'white',
+              color: 'var(--ink)'
             }}
           >
             <option value="all">Alle Küchen</option>
@@ -158,14 +176,15 @@ export default function EventsPage() {
 
       {upcomingEvents.length === 0 && (
         <div data-testid="no-events" style={{
-          padding: '40px',
-          background: '#f8f9fa',
-          borderRadius: '12px',
+          padding: '60px 40px',
+          background: 'var(--paper-warm)',
+          borderRadius: 'var(--radius-md)',
           textAlign: 'center',
-          marginBottom: '40px'
+          marginBottom: '40px',
+          border: '1px solid var(--line)'
         }}>
-          <h2 style={{ marginBottom: '16px' }}>Keine kommenden Events</h2>
-          <p style={{ color: '#666' }}>
+          <h2 style={{ marginBottom: '16px', fontFamily: 'var(--font-display)' }}>Keine kommenden Events</h2>
+          <p style={{ color: 'var(--ink-soft)', fontFamily: 'var(--font-body)' }}>
             Aktuell sind keine Events geplant. Schau später wieder vorbei!
           </p>
         </div>
@@ -173,46 +192,67 @@ export default function EventsPage() {
 
       {upcomingEvents.length > 0 && (
         <>
-          <h2 style={{ marginBottom: '24px', fontSize: '20px' }}>📅 Kommende Events</h2>
-          <div style={{ display: 'grid', gap: '24px', marginBottom: '48px' }}>
+          <h2 style={{
+            marginBottom: '28px',
+            fontSize: '1.25rem',
+            fontFamily: 'var(--font-display)',
+            fontWeight: '500',
+            color: 'var(--ink)'
+          }}>Kommende Events</h2>
+          <div style={{ display: 'grid', gap: '28px', marginBottom: '60px' }}>
             {upcomingEvents.map(event => (
               <div
                 key={event.id}
-                className="card"
+                className="card event-card"
                 data-testid="event-card"
                 style={{
-                  padding: '24px',
-                  border: event.seatsAvailable === 0 ? '2px solid #dc3545' : '1px solid #e5e7eb'
+                  padding: '28px',
+                  border: event.seatsAvailable === 0
+                    ? '1px solid var(--bordeaux)'
+                    : '1px solid var(--messing-light)'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '16px' }}>
-                  <div style={{ flex: 1, minWidth: '250px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px', flexWrap: 'wrap' }}>
-                      <h3 data-testid="event-name" style={{ fontSize: '24px', margin: 0 }}>{event.name}</h3>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '24px' }}>
+                  <div style={{ flex: 1, minWidth: '280px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '12px', flexWrap: 'wrap' }}>
+                      <h3 data-testid="event-name" style={{
+                        fontFamily: 'var(--font-display)',
+                        fontSize: '1.5rem',
+                        fontWeight: '500',
+                        margin: 0,
+                        color: 'var(--ink)'
+                      }}>{event.name}</h3>
                       {event.cuisineType && (
                         <span
                           data-testid="cuisine-badge"
-                          style={{
-                            padding: '4px 12px',
-                            background: '#e3f2fd',
-                            color: '#1976d2',
-                            borderRadius: '16px',
-                            fontSize: '14px',
-                            fontWeight: '500'
-                          }}
+                          className="cuisine-badge"
                         >
                           {event.cuisineType}
                         </span>
                       )}
                     </div>
-                    <p data-testid="event-date" style={{ color: '#666', marginBottom: '16px' }}>
-                      📅 {formatDate(event.date)}
+                    <p data-testid="event-date" style={{
+                      color: 'var(--ink-soft)',
+                      marginBottom: '16px',
+                      fontFamily: 'var(--font-body)',
+                      fontSize: '15px'
+                    }}>
+                      {formatDate(event.date)}
                     </p>
-                    <p data-testid="event-address" style={{ marginBottom: '8px' }}>
-                      📍 {event.address}
+                    <p data-testid="event-address" style={{
+                      marginBottom: '12px',
+                      fontFamily: 'var(--font-body)',
+                      color: 'var(--ink)'
+                    }}>
+                      {event.address}
                     </p>
                     {event.description && (
-                      <p style={{ marginTop: '12px', color: '#333' }}>
+                      <p style={{
+                        marginTop: '16px',
+                        color: 'var(--ink-soft)',
+                        fontFamily: 'var(--font-body)',
+                        lineHeight: '1.7'
+                      }}>
                         {event.description}
                       </p>
                     )}
@@ -221,63 +261,88 @@ export default function EventsPage() {
                         href={event.menuUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        style={{ display: 'inline-block', marginTop: '12px' }}
+                        style={{
+                          display: 'inline-block',
+                          marginTop: '16px',
+                          color: 'var(--messing-dark)',
+                          fontFamily: 'var(--font-ui)',
+                          fontSize: '14px',
+                          fontWeight: '500'
+                        }}
                       >
-                        🔗 Speisekarte ansehen
+                        Speisekarte ansehen →
                       </a>
                     )}
                   </div>
 
-                  <div style={{
+                  <div className="seat-counter" style={{
                     textAlign: 'center',
-                    minWidth: '200px',
-                    padding: '16px',
-                    background: '#f8f9fa',
-                    borderRadius: '8px'
+                    minWidth: '220px',
+                    margin: 0
                   }}>
-                    <div data-testid="seats-available" style={{
-                      fontSize: '32px',
-                      fontWeight: 'bold',
-                      color: event.seatsAvailable === 0 ? '#dc3545' : '#28a745',
-                      marginBottom: '8px'
+                    <div data-testid="seats-available" className="number" style={{
+                      color: event.seatsAvailable === 0 ? 'var(--bordeaux)' : 'var(--messing-dark)'
                     }}>
                       {event.seatsAvailable}
                     </div>
-                    <div style={{ fontSize: '14px', color: '#666', marginBottom: '16px' }}>
+                    <div className="label">
                       von {event.maxSeats} Plätzen verfügbar
                     </div>
 
-                    {bookingStatus[event.id] === 'loading' ? (
-                      <button className="btn" disabled style={{ width: '100%' }}>
-                        Wird gebucht...
-                      </button>
-                    ) : bookingStatus[event.id] === 'success' ? (
-                      <div style={{ color: '#28a745', fontWeight: 'bold' }}>
-                        ✅ Erfolgreich gebucht!
-                      </div>
-                    ) : bookingStatus[event.id] ? (
-                      <div style={{ color: '#dc3545', fontSize: '14px' }}>
-                        {bookingStatus[event.id]}
-                      </div>
-                    ) : (
-                      <button
-                        className="btn"
-                        onClick={() => handleBooking(event.id)}
-                        disabled={event.seatsAvailable === 0}
-                        style={{ width: '100%' }}
-                      >
-                        {event.seatsAvailable === 0 ? 'Ausgebucht' : 'Platz reservieren'}
-                      </button>
-                    )}
+                    <div style={{ marginTop: '20px' }}>
+                      {bookingStatus[event.id] === 'loading' ? (
+                        <button className="btn full" disabled>
+                          Wird gebucht...
+                        </button>
+                      ) : bookingStatus[event.id] === 'success' ? (
+                        <div style={{
+                          color: 'var(--messing-dark)',
+                          fontWeight: '600',
+                          fontFamily: 'var(--font-ui)',
+                          fontSize: '14px'
+                        }}>
+                          Erfolgreich gebucht!
+                        </div>
+                      ) : bookingStatus[event.id] ? (
+                        <div style={{
+                          color: 'var(--bordeaux)',
+                          fontSize: '14px',
+                          fontFamily: 'var(--font-ui)'
+                        }}>
+                          {bookingStatus[event.id]}
+                        </div>
+                      ) : (
+                        <button
+                          className="btn full"
+                          onClick={() => handleBooking(event.id)}
+                          disabled={event.seatsAvailable === 0}
+                        >
+                          {event.seatsAvailable === 0 ? 'Ausgebucht' : 'Platz reservieren'}
+                        </button>
+                      )}
+                    </div>
 
                     {event.attendees.length > 0 && (
-                      <details style={{ marginTop: '16px', textAlign: 'left' }}>
-                        <summary style={{ cursor: 'pointer', fontSize: '14px', color: '#666' }}>
+                      <details style={{ marginTop: '20px', textAlign: 'left' }}>
+                        <summary style={{
+                          cursor: 'pointer',
+                          fontSize: '13px',
+                          color: 'var(--ink-soft)',
+                          fontFamily: 'var(--font-ui)',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.05em'
+                        }}>
                           {event.attendees.length} Teilnehmer
                         </summary>
-                        <ul style={{ marginTop: '8px', fontSize: '14px', paddingLeft: '20px' }}>
+                        <ul style={{
+                          marginTop: '12px',
+                          fontSize: '14px',
+                          paddingLeft: '20px',
+                          fontFamily: 'var(--font-body)',
+                          color: 'var(--ink-soft)'
+                        }}>
                           {event.attendees.map(attendee => (
-                            <li key={attendee.id}>{attendee.name}</li>
+                            <li key={attendee.id} style={{ marginBottom: '4px' }}>{attendee.name}</li>
                           ))}
                         </ul>
                       </details>
@@ -291,9 +356,15 @@ export default function EventsPage() {
       )}
 
       {pastEvents.length > 0 && (
-        <>
-          <h2 style={{ marginBottom: '24px', fontSize: '20px', color: '#666' }}>
-            📌 Vergangene Events
+        <div style={{ marginTop: '60px' }}>
+          <h2 style={{
+            marginBottom: '28px',
+            fontSize: '1.25rem',
+            fontFamily: 'var(--font-display)',
+            fontWeight: '500',
+            color: 'var(--ink-soft)'
+          }}>
+            Vergangene Events
           </h2>
           <div style={{ display: 'grid', gap: '16px' }}>
             {pastEvents.map(event => (
@@ -301,19 +372,29 @@ export default function EventsPage() {
                 key={event.id}
                 className="card"
                 style={{
-                  padding: '16px',
-                  opacity: 0.7,
-                  background: '#f8f9fa'
+                  padding: '20px 24px',
+                  background: 'var(--paper-warm)',
+                  border: '1px solid var(--line)'
                 }}
               >
-                <h3 style={{ marginBottom: '8px', fontSize: '18px' }}>{event.name}</h3>
-                <p style={{ color: '#666', fontSize: '14px' }}>
-                  {formatDate(event.date)} • {event.attendees.length} Teilnehmer
+                <h3 style={{
+                  marginBottom: '8px',
+                  fontSize: '1.1rem',
+                  fontFamily: 'var(--font-display)',
+                  fontWeight: '500',
+                  color: 'var(--ink-soft)'
+                }}>{event.name}</h3>
+                <p style={{
+                  color: 'var(--ink-soft)',
+                  fontSize: '14px',
+                  fontFamily: 'var(--font-body)'
+                }}>
+                  {formatDate(event.date)} · {event.attendees.length} Teilnehmer
                 </p>
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
     </div>
   )
