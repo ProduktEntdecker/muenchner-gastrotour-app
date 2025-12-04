@@ -2,11 +2,9 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
-  const router = useRouter()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
@@ -33,9 +31,8 @@ export default function LoginPage() {
           setError(error.message)
         }
       } else {
-        // Redirect to events page on successful login
-        router.push('/events')
-        router.refresh()
+        // Hard redirect to ensure cookies are sent and NavBar refreshes
+        window.location.href = '/events'
       }
     } catch {
       setError('Netzwerkfehler. Bitte versuche es später erneut.')
