@@ -110,6 +110,9 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const supabase = await createClient()
 
     // Sign up the user with Supabase Auth
+    // Build the redirect URL for email confirmation
+    const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.muenchner-gastrotour.de'
+
     const { data, error } = await supabase.auth.signUp({
       email: normalizedEmail,
       password,
@@ -117,6 +120,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         data: {
           full_name: sanitizedName,
         },
+        emailRedirectTo: `${siteUrl}/auth/callback`,
       },
     })
 
