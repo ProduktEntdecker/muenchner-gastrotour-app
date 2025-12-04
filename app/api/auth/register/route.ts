@@ -126,10 +126,17 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     if (error) {
       console.error('Supabase signup error:', error)
-      if (error.message.includes('already registered') || 
+      if (error.message.includes('already registered') ||
           error.message.includes('Email address') && error.message.includes('is invalid')) {
         return NextResponse.json(
           { error: 'Diese E-Mail-Adresse ist bereits registriert' },
+          { status: 400 }
+        )
+      }
+      // Handle pwned/leaked password error
+      if (error.message.includes('weak') || error.message.includes('pwned')) {
+        return NextResponse.json(
+          { error: 'Dieses Passwort wurde in einem Datenleck gefunden. Bitte wähle ein anderes Passwort.' },
           { status: 400 }
         )
       }
