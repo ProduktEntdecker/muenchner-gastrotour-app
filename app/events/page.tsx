@@ -1,11 +1,18 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import ReviewForm from '@/components/ReviewForm'
+
+interface AverageRating {
+  food: number
+  ambiance: number
+  service: number
+  overall: number
+}
 
 interface Event {
-  id: number
+  id: string
   name: string
   date: string
   address: string
@@ -17,17 +24,22 @@ interface Event {
   maxSeats: number
   seatsAvailable: number
   seatsTaken: number
-  attendees: { id: number; name: string }[]
+  attendees: { id: string; name: string }[]
   cuisineType?: string
+  reviewCount: number
+  averageRating: AverageRating | null
+  userAttended: boolean
+  userReviewed: boolean
 }
 
-export default function EventsPage() {
+export default function EventsPage(): JSX.Element {
   const router = useRouter()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
-  const [bookingStatus, setBookingStatus] = useState<{ [key: number]: string }>({})
+  const [bookingStatus, setBookingStatus] = useState<{ [key: string]: string }>({})
   const [cuisineFilter, setCuisineFilter] = useState<string>('all')
+  const [reviewingEvent, setReviewingEvent] = useState<Event | null>(null)
 
   useEffect(() => {
     fetchEvents()
@@ -35,7 +47,8 @@ export default function EventsPage() {
 
   const fetchEvents = async () => {
     try {
-      const res = await fetch('/api/events?upcoming=true')
+      // Fetch all events (not just upcoming) to show past events with reviews
+      const res = await fetch('/api/events?limit=50')
       const data = await res.json()
 
       if (res.ok) {
@@ -43,14 +56,14 @@ export default function EventsPage() {
       } else {
         setError(data.error || 'Fehler beim Laden der Events')
       }
-    } catch (err) {
+    } catch {
       setError('Netzwerkfehler beim Laden der Events')
     } finally {
       setLoading(false)
     }
   }
 
-  const handleBooking = async (eventId: number) => {
+  const handleBooking = async (eventId: string) => {
     setBookingStatus(prev => ({ ...prev, [eventId]: 'loading' }))
 
     try {
@@ -415,24 +428,86 @@ export default function EventsPage() {
                   border: '1px solid var(--line)'
                 }}
               >
-                <h3 style={{
-                  marginBottom: '8px',
-                  fontSize: '1.1rem',
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: '500',
-                  color: 'var(--ink-soft)'
-                }}>{event.name}</h3>
-                <p style={{
-                  color: 'var(--ink-soft)',
-                  fontSize: '14px',
-                  fontFamily: 'var(--font-body)'
-                }}>
-                  {formatDate(event.date)} · {event.attendees.length} Teilnehmer
-                </p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', gap: '16px', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: '200px' }}>
+                    <h3 style={{
+                      marginBottom: '8px',
+                      fontSize: '1.1rem',
+                      fontFamily: 'var(--font-display)',
+                      fontWeight: '500',
+                      color: 'var(--ink-soft)'
+                    }}>{event.name}</h3>
+                    <p style={{
+                      color: 'var(--ink-soft)',
+                      fontSize: '14px',
+                      fontFamily: 'var(--font-body)',
+                      marginBottom: '8px'
+                    }}>
+                      {formatDate(event.date)} · {event.attendees.length} Teilnehmer
+                    </p>
+
+                    {/* Average Rating Display */}
+                    {event.averageRating && (
+                      <div style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        marginTop: '8px'
+                      }}>
+                        <span style={{ color: 'var(--messing-dark)', fontSize: '18px' }}>
+                          {'★'.repeat(Math.round(event.averageRating.overall))}
+                          {'☆'.repeat(5 - Math.round(event.averageRating.overall))}
+                        </span>
+                        <span style={{
+                          fontSize: '13px',
+                          color: 'var(--ink-soft)',
+                          fontFamily: 'var(--font-ui)'
+                        }}>
+                          {event.averageRating.overall.toFixed(1)} ({event.reviewCount} {event.reviewCount === 1 ? 'Bewertung' : 'Bewertungen'})
+                        </span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Review Button */}
+                  <div style={{ textAlign: 'right' }}>
+                    {event.userAttended && !event.userReviewed && (
+                      <button
+                        className="btn secondary"
+                        onClick={() => setReviewingEvent(event)}
+                        style={{ fontSize: '13px', padding: '8px 16px' }}
+                      >
+                        Bewerten
+                      </button>
+                    )}
+                    {event.userReviewed && (
+                      <span style={{
+                        fontSize: '13px',
+                        color: 'var(--messing-dark)',
+                        fontFamily: 'var(--font-ui)'
+                      }}>
+                        ✓ Bewertet
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
+      )}
+
+      {/* Review Modal */}
+      {reviewingEvent && (
+        <ReviewForm
+          eventId={reviewingEvent.id}
+          eventName={reviewingEvent.name}
+          onClose={() => setReviewingEvent(null)}
+          onSuccess={() => {
+            setReviewingEvent(null)
+            fetchEvents() // Refresh to show updated review status
+          }}
+        />
       )}
     </div>
   )
