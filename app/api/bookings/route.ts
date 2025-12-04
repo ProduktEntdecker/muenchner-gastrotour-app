@@ -191,8 +191,8 @@ export async function POST(request: NextRequest) {
       }
     } else {
       // Production mode: require authentication
-      supabase = await createClient();
-      const { data: { user } } = await supabase.auth.getUser();
+      const authClient = await createClient();
+      const { data: { user } } = await authClient.auth.getUser();
 
       if (!user) {
         return NextResponse.json(
@@ -203,6 +203,9 @@ export async function POST(request: NextRequest) {
 
       userId = user.id;
       userEmailAddress = user.email!;
+
+      // Use service role client for database operations to bypass RLS
+      supabase = createServiceRoleClient();
     }
 
     // Check if event exists
