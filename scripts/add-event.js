@@ -31,7 +31,7 @@ const newEvent = {
   lng: 11.575972,
   homepage: 'https://example-restaurant.de',
   menu_url: 'https://example-restaurant.de/speisekarte',
-  max_seats: 8,
+  max_seats: 7,
   host_counts_as_seat: true,
   status: 'upcoming'
 };
@@ -101,7 +101,7 @@ const additionalEvents = [
     lng: 11.545850,
     homepage: 'https://augustiner-braeu.de',
     menu_url: 'https://augustiner-braeu.de/speisekarte',
-    max_seats: 10,
+    max_seats: 7,
     host_counts_as_seat: true,
     status: 'upcoming'
   },
@@ -114,7 +114,7 @@ const additionalEvents = [
     lng: 11.580438,
     homepage: 'https://asia-fusion-munich.de',
     menu_url: 'https://asia-fusion-munich.de/menu',
-    max_seats: 6,
+    max_seats: 7,
     host_counts_as_seat: true,
     status: 'upcoming'
   }

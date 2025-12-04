@@ -14,7 +14,7 @@ Münchner Gastrotour is a dining meetup platform for a 60-person Munich group, r
 
 ## Repository Structure
 
-This is the **production code repository**. Project documentation and planning live in a separate repository.
+This is the **production code repository**. Project documentation lives in Obsidian Vault.
 
 **Production Repo** (this repo):
 - `app/` - Next.js App Router pages and API routes
@@ -22,9 +22,9 @@ This is the **production code repository**. Project documentation and planning l
 - `components/` - React components
 - `tests/` - E2E tests (Playwright)
 
-**Documentation Repo** (separate):
-- Location: `~/Documents/GitHub/muenchner-gastrotour`
-- Contains: Business requirements, planning, session handovers
+**Documentation** (Obsidian Vault):
+- Location: `~/Documents/GitHub/flos-claude-vault/Projects/P-Muenchner-Gastrotour`
+- Contains: Business requirements, planning, session handovers, architecture docs
 - **IMPORTANT**: Read handover documents from there for session context
 
 ## Session Handover Documents
@@ -32,18 +32,18 @@ This is the **production code repository**. Project documentation and planning l
 **Before starting work, read the latest handover:**
 
 ```bash
-# Latest handover location
-~/Documents/GitHub/muenchner-gastrotour/4-project-management/handovers/SESSION-*-HANDOVER.md
+# Latest handover location (Obsidian Vault)
+~/Documents/GitHub/flos-claude-vault/Projects/P-Muenchner-Gastrotour/4-project-management/handovers/SESSION-*-HANDOVER.md
 
 # Current focus
-~/Documents/GitHub/muenchner-gastrotour/ONE-THING.md
+~/Documents/GitHub/flos-claude-vault/Projects/P-Muenchner-Gastrotour/ONE-THING.md
 ```
 
-**At end of session, update handover in documentation repo:**
+**At end of session, update handover in Obsidian:**
 
 ```bash
-cd ~/Documents/GitHub/muenchner-gastrotour
-# Create/update handover file
+cd ~/Documents/GitHub/flos-claude-vault
+# Create/update handover file in Projects/P-Muenchner-Gastrotour
 # Update ONE-THING.md
 git add . && git commit && git push
 ```
@@ -248,17 +248,13 @@ Tests cover 5 critical user journeys:
 
 ## Current Development Focus
 
-**See ~/Documents/GitHub/muenchner-gastrotour/ONE-THING.md for the immediate priority**
+**See Obsidian Vault for the immediate priority:**
+`~/Documents/GitHub/flos-claude-vault/Projects/P-Muenchner-Gastrotour/ONE-THING.md`
 
-**Current Session**: Session 3
-**Primary Objective**: Display events on `/events` page (TDD approach)
-
-**Session 3 Tasks**:
-1. Update `/events` page to fetch from API
-2. Display event cards with details
-3. Show seats available
-4. Add loading/error states
-5. Verify in production
+**Current Status**: Session 8 completed (Dec 2025)
+- Booking API implementation complete
+- Invitation code feature added for closed group registration
+- Domain corrected to ASCII version (muenchner-gastrotour.de)
 
 ## Development Workflow
 
@@ -288,15 +284,15 @@ Tests cover 5 critical user journeys:
    git push  # Auto-deploys
    ```
 
-2. **Update documentation** (in docs repo):
+2. **Update documentation** (in Obsidian Vault):
    ```bash
-   cd ~/Documents/GitHub/muenchner-gastrotour
+   cd ~/Documents/GitHub/flos-claude-vault
 
    # Create/update session handover
-   vim 4-project-management/handovers/SESSION-XX-HANDOVER.md
+   vim Projects/P-Muenchner-Gastrotour/4-project-management/handovers/SESSION-XX-HANDOVER.md
 
    # Update ONE-THING.md
-   vim ONE-THING.md
+   vim Projects/P-Muenchner-Gastrotour/ONE-THING.md
 
    git add .
    git commit -m "docs: Session XX handover"
@@ -313,26 +309,27 @@ Tests cover 5 critical user journeys:
 ### URLs
 - **Production**: https://muenchner-gastrotour-app.vercel.app
 - **GitHub**: https://github.com/ProduktEntdecker/muenchner-gastrotour-app
-- **Docs Repo**: ~/Documents/GitHub/muenchner-gastrotour
 - **Supabase**: https://ppypwhnxgphraleorioq.supabase.co
 
 ### Key Documentation Files
-**In docs repo** (`~/Documents/GitHub/muenchner-gastrotour`):
+**In Obsidian Vault** (`~/Documents/GitHub/flos-claude-vault/Projects/P-Muenchner-Gastrotour`):
 - `ONE-THING.md` - Current focus and session plan
 - `CLAUDE.md` - Full project context
 - `4-project-management/handovers/SESSION-*-HANDOVER.md` - Session summaries
+- `1-business/` - Business requirements
+- `5-documentation/` - Architecture docs
 
 **In this repo**:
-- `README.md` - Quick start guide (if exists)
-- `.env.example` - Required environment variables
-- `docs/` - Technical documentation (if exists)
+- `README.md` - Quick start guide
+- `.env.local.example` - Required environment variables
+- `docs/` - Technical documentation
 
 ## Quick Start for New Session
 
 ```bash
-# 1. Read context from docs repo
-cat ~/Documents/GitHub/muenchner-gastrotour/ONE-THING.md
-cat ~/Documents/GitHub/muenchner-gastrotour/4-project-management/handovers/SESSION-*-HANDOVER.md | tail -n 100
+# 1. Read context from Obsidian Vault
+cat ~/Documents/GitHub/flos-claude-vault/Projects/P-Muenchner-Gastrotour/ONE-THING.md
+ls ~/Documents/GitHub/flos-claude-vault/Projects/P-Muenchner-Gastrotour/4-project-management/handovers/
 
 # 2. Pull latest code
 cd ~/Documents/GitHub/muenchner-gastrotour-app
