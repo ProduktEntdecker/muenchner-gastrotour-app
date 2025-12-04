@@ -64,7 +64,7 @@ export async function middleware(request: NextRequest) {
     )
 
     // Auth routes that should always be accessible
-    const authPaths = ['/login', '/register', '/auth/confirm', '/auth/callback', '/auth/reset']
+    const authPaths = ['/login', '/register', '/auth/confirm', '/auth/callback', '/auth/reset', '/auth/update-password']
     const isAuthPath = authPaths.some(path =>
       request.nextUrl.pathname.startsWith(path)
     )

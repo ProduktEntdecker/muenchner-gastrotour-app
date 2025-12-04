@@ -74,6 +74,11 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 minLength={6}
               />
+              <div style={{ textAlign: 'right', marginTop: '8px' }}>
+                <Link href="/auth/reset" style={{ fontSize: '14px', color: 'var(--primary)' }}>
+                  Passwort vergessen?
+                </Link>
+              </div>
             </div>
 
             {error && <div className="error" role="alert" aria-live="assertive">{error}</div>}
