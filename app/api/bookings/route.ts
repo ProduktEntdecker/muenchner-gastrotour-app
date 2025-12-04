@@ -205,16 +205,10 @@ export async function POST(request: NextRequest) {
       userEmailAddress = user.email!;
     }
 
-    // Check if event exists and get booking count
+    // Check if event exists
     const { data: event, error: eventError } = await supabase
       .from('events')
-      .select(`
-        *,
-        bookings!inner (
-          id,
-          status
-        )
-      `)
+      .select('*')
       .eq('id', eventId)
       .single();
 
