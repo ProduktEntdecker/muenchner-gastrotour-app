@@ -115,13 +115,25 @@ export async function POST(request: NextRequest) {
     // Apply rate limiting
     await applyRateLimit(RATE_LIMITS.bookingsCreate, request);
 
-    // CSRF protection: validate origin
+    // CSRF protection: validate origin using explicit preconfigured origins
     const origin = request.headers.get('origin');
-    const host = request.headers.get('host');
-    const expectedOrigin = process.env.NEXT_PUBLIC_APP_URL || `https://${host}`;
 
-    // Only validate origin if it's present (browser requests)
-    if (origin && origin !== expectedOrigin && !origin.includes('localhost')) {
+    const allowedOrigins = [
+      process.env.NEXT_PUBLIC_APP_URL,
+      process.env.NEXT_PUBLIC_PREVIEW_URL,
+      'https://muenchner-gastrotour.de',
+      'https://www.muenchner-gastrotour.de',
+      'https://muenchner-gastrotour-app.vercel.app',
+      'http://localhost:3000',
+      'http://localhost:3001',
+    ]
+      .filter(Boolean)
+      .map((value) => value!.replace(/\/$/, ''));
+
+    // Normalize origin by removing trailing slash
+    const normalizedOrigin = origin?.replace(/\/$/, '');
+    if (normalizedOrigin && !allowedOrigins.includes(normalizedOrigin)) {
+      console.error('CSRF blocked origin:', normalizedOrigin, 'allowed:', allowedOrigins);
       return NextResponse.json(
         { error: 'Invalid request origin' },
         { status: 403 }
