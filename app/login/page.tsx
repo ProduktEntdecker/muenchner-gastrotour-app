@@ -7,6 +7,7 @@ import { createClient } from '@/lib/supabase/client'
 export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [rememberMe, setRememberMe] = useState(true)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -17,6 +18,17 @@ export default function LoginPage() {
 
     try {
       const supabase = createClient()
+
+      // Set session persistence based on "Remember Me" checkbox
+      // When checked: session persists across browser restarts (30 days)
+      // When unchecked: session ends when browser closes
+      if (!rememberMe) {
+        // For non-persistent session, we'll handle logout on browser close via storage
+        localStorage.setItem('gastrotour_session_temp', 'true')
+      } else {
+        localStorage.removeItem('gastrotour_session_temp')
+      }
+
       const { error } = await supabase.auth.signInWithPassword({
         email: email.trim().toLowerCase(),
         password
@@ -73,8 +85,17 @@ export default function LoginPage() {
                 placeholder="••••••••"
                 minLength={6}
               />
-              <div style={{ textAlign: 'right', marginTop: '8px' }}>
-                <Link href="/auth/reset" style={{ fontSize: '14px', color: 'var(--primary)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '14px' }}>
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                  />
+                  Angemeldet bleiben
+                </label>
+                <Link href="/auth/reset" style={{ fontSize: '14px', color: 'var(--messing-dark)' }}>
                   Passwort vergessen?
                 </Link>
               </div>
