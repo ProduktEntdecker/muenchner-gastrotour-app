@@ -12,6 +12,8 @@ interface Event {
   description?: string
   menuUrl?: string
   imageUrl?: string
+  pressReview?: string
+  pressSource?: string
   maxSeats: number
   seatsAvailable: number
   seatsTaken: number
@@ -295,6 +297,18 @@ export default function EventsPage() {
                       >
                         Speisekarte ansehen →
                       </a>
+                    )}
+                    {event.pressReview && (
+                      <div style={{ marginTop: '20px' }}>
+                        <blockquote className="quote">
+                          „{event.pressReview}"
+                        </blockquote>
+                        {event.pressSource && (
+                          <p className="quote-author">
+                            — {event.pressSource}
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
 
