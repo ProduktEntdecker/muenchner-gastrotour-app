@@ -66,7 +66,7 @@ export default function HomePage() {
           </div>
         </div>
 
-        <div style={{ marginTop: '80px', maxWidth: '700px', margin: '80px auto 0' }}>
+        <div style={{ maxWidth: '700px', margin: '80px auto 0' }}>
           <h2 style={{ marginBottom: '12px' }}>So funktioniert&apos;s</h2>
           <p style={{ color: 'var(--ink-soft)', marginBottom: '40px', fontSize: '16px' }}>
             In drei einfachen Schritten zum gemeinsamen Dinner

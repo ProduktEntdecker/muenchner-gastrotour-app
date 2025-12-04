@@ -328,28 +328,6 @@ a:focus-visible {
   gap: 8px;
 }
 
-.seat-counter {
-  text-align: center;
-  padding: 20px;
-  background: linear-gradient(135deg, #f0f9ff 0%, #e6f3ff 100%);
-  border: 2px solid var(--accent-weak);
-  border-radius: 12px;
-  margin: 20px 0;
-}
-
-.seat-counter .number {
-  font-size: 48px;
-  font-weight: bold;
-  color: var(--cta);
-  line-height: 1;
-}
-
-.seat-counter .label {
-  font-size: 14px;
-  color: var(--muted);
-  margin-top: 8px;
-}
-
 .auth-container {
   max-width: 400px;
   margin: 60px auto;

@@ -48,7 +48,7 @@ export default function EventsPage() {
   }
 
   const handleBooking = async (eventId: number) => {
-    setBookingStatus({ ...bookingStatus, [eventId]: 'loading' })
+    setBookingStatus(prev => ({ ...prev, [eventId]: 'loading' }))
 
     try {
       const res = await fetch('/api/bookings', {
@@ -60,25 +60,25 @@ export default function EventsPage() {
       const data = await res.json()
 
       if (res.ok) {
-        setBookingStatus({ ...bookingStatus, [eventId]: 'success' })
+        setBookingStatus(prev => ({ ...prev, [eventId]: 'success' }))
         // Refresh events to update seat counts
         await fetchEvents()
         setTimeout(() => {
-          setBookingStatus({ ...bookingStatus, [eventId]: '' })
+          setBookingStatus(prev => ({ ...prev, [eventId]: '' }))
         }, 3000)
       } else if (res.status === 401) {
         // Redirect to login if not authenticated
         router.push('/login?redirect=/events')
       } else {
-        setBookingStatus({ ...bookingStatus, [eventId]: data.error || 'Buchung fehlgeschlagen' })
+        setBookingStatus(prev => ({ ...prev, [eventId]: data.error || 'Buchung fehlgeschlagen' }))
         setTimeout(() => {
-          setBookingStatus({ ...bookingStatus, [eventId]: '' })
+          setBookingStatus(prev => ({ ...prev, [eventId]: '' }))
         }, 5000)
       }
     } catch (err) {
-      setBookingStatus({ ...bookingStatus, [eventId]: 'Netzwerkfehler' })
+      setBookingStatus(prev => ({ ...prev, [eventId]: 'Netzwerkfehler' }))
       setTimeout(() => {
-        setBookingStatus({ ...bookingStatus, [eventId]: '' })
+        setBookingStatus(prev => ({ ...prev, [eventId]: '' }))
       }, 5000)
     }
   }
