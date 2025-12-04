@@ -20,15 +20,14 @@ export async function updateSession(request: NextRequest) {
             request,
           })
           cookiesToSet.forEach(({ name, value, options }) => {
-            // Enhance cookie security
+            // Enhance cookie security with 30-day persistence
             const secureOptions = {
               ...options,
               httpOnly: true,
               secure: process.env.NODE_ENV === 'production',
-              sameSite: 'strict' as const,
+              sameSite: 'lax' as const,  // 'lax' for same-site navigation
               path: '/',
-              // Add max-age for session cookies (30 days)
-              maxAge: options?.maxAge || 30 * 24 * 60 * 60,
+              maxAge: 60 * 60 * 24 * 30,  // 30 days - stay logged in
             }
             supabaseResponse.cookies.set(name, value, secureOptions)
           })

@@ -16,13 +16,14 @@ export async function createClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
-              // Enhanced cookie security settings
+              // Enhanced cookie security settings with 30-day persistence
               const enhancedOptions = {
                 ...options,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax' as const,  // 'lax' is better for same-site navigation
+                sameSite: 'lax' as const,
                 path: '/',
+                maxAge: 60 * 60 * 24 * 30,  // 30 days - stay logged in
               }
               cookieStore.set(name, value, enhancedOptions)
             })
