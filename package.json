@@ -35,7 +35,7 @@
     "typescript": "^5"
   },
   "devDependencies": {
-    "@playwright/test": "^1.55.1",
+    "@playwright/test": "^1.57.0",
     "eslint": "^9.18.0",
     "eslint-config-next": "^15.5.7",
     "playwright": "^1.55.1",

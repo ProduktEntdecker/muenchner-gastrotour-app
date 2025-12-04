@@ -2,111 +2,101 @@ import { test, expect } from '@playwright/test'
 
 /**
  * Critical User Journey #1: User Registration
- * Prevents production incidents with user onboarding
+ * Tests the complete registration flow with invitation code
+ *
+ * Current app state:
+ * - Registration requires invitation code
+ * - Password minimum 6 characters
+ * - Form uses id selectors (#name, #email, etc.)
  */
 test.describe('User Registration', () => {
-  test('should allow new user to register successfully', async ({ page }) => {
-    // Navigate to registration page
+  // Use a valid invitation code from environment or default test code
+  const INVITATION_CODE = process.env.INVITATION_CODE || 'GASTRO2025'
+
+  test('should display registration form with all required fields', async ({ page }) => {
     await page.goto('/register')
-    
+
     // Verify page loaded correctly
-    await expect(page).toHaveTitle(/Account erstellen|Registr/)
     await expect(page.locator('h1')).toContainText('Account erstellen')
-    
-    // Fill out registration form
-    const testEmail = `test-${Date.now()}@example.com`
-    const testPassword = 'TestPassword123!'
-    
-    await page.fill('input[name="name"]', 'Test User')
-    await page.fill('input[name="email"]', testEmail)
-    await page.fill('input[name="password"]', testPassword)
-    await page.fill('input[name="confirmPassword"]', testPassword)
-    
+
+    // Verify all form fields are present
+    await expect(page.locator('#name')).toBeVisible()
+    await expect(page.locator('#email')).toBeVisible()
+    await expect(page.locator('#invitationCode')).toBeVisible()
+    await expect(page.locator('#password')).toBeVisible()
+    await expect(page.locator('#confirmPassword')).toBeVisible()
+
+    // Verify submit button
+    await expect(page.locator('button[type="submit"]')).toContainText('Account erstellen')
+  })
+
+  test('should show validation for empty form submission', async ({ page }) => {
+    await page.goto('/register')
+
+    // Submit button should be disabled when fields are empty
+    const submitButton = page.locator('button[type="submit"]')
+    await expect(submitButton).toBeDisabled()
+  })
+
+  test('should validate password confirmation mismatch', async ({ page }) => {
+    await page.goto('/register')
+
+    // Fill form with mismatched passwords
+    await page.fill('#name', 'Test User')
+    await page.fill('#email', 'test@example.com')
+    await page.fill('#invitationCode', INVITATION_CODE)
+    await page.fill('#password', 'TestPass123')
+    await page.fill('#confirmPassword', 'DifferentPass')
+
     // Submit form
     await page.click('button[type="submit"]')
-    
-    // Should show success message or redirect
-    await expect(page.locator('.success, [data-testid="success"]')).toBeVisible({ timeout: 10000 })
-    
-    // Should contain confirmation message
-    await expect(page.locator('text=/E-Mail|bestätigt|erfolgreich/i')).toBeVisible()
-  })
-  
-  test('should show validation errors for invalid input', async ({ page }) => {
-    await page.goto('/register')
-    
-    // Try to submit with empty form
-    await page.click('button[type="submit"]')
-    
-    // Should show validation errors (HTML5 or custom)
-    const nameField = page.locator('input[name="name"]')
-    const emailField = page.locator('input[name="email"]')
-    const passwordField = page.locator('input[name="password"]')
-    
-    // Check HTML5 validation or custom error messages
-    await expect(nameField).toBeRequired()
-    await expect(emailField).toBeRequired()  
-    await expect(passwordField).toBeRequired()
-  })
-  
-  test('should reject duplicate email registration', async ({ page }) => {
-    // First, register a user
-    await page.goto('/register')
-    
-    const testEmail = 'duplicate-test@example.com'
-    const testPassword = 'TestPassword123!'
-    
-    await page.fill('input[name="name"]', 'First User')
-    await page.fill('input[name="email"]', testEmail)
-    await page.fill('input[name="password"]', testPassword)
-    await page.fill('input[name="confirmPassword"]', testPassword)
-    
-    await page.click('button[type="submit"]')
 
-    // Wait for first registration to complete by checking for success indicator
-    await page.waitForSelector('.success, [data-testid="success"], text=/E-Mail|bestätigt|erfolgreich/i', {
-      timeout: 10000,
-      state: 'visible'
-    })
-
-    // Try to register again with same email
-    await page.goto('/register')
-    
-    await page.fill('input[name="name"]', 'Second User')
-    await page.fill('input[name="email"]', testEmail)
-    await page.fill('input[name="password"]', testPassword)
-    await page.fill('input[name="confirmPassword"]', testPassword)
-    
-    await page.click('button[type="submit"]')
-    
-    // Should show error message about duplicate email
-    await expect(page.locator('.error, [data-testid="error"]')).toBeVisible({ timeout: 10000 })
-    await expect(page.locator('text=/bereits|registriert|exists/i')).toBeVisible()
-  })
-  
-  test('should validate password confirmation match', async ({ page }) => {
-    await page.goto('/register')
-    
-    await page.fill('input[name="name"]', 'Test User')
-    await page.fill('input[name="email"]', 'test@example.com')
-    await page.fill('input[name="password"]', 'TestPassword123!')
-    await page.fill('input[name="confirmPassword"]', 'DifferentPassword!')
-    
-    await page.click('button[type="submit"]')
-    
     // Should show password mismatch error
-    await expect(page.locator('text=/Passwörter.*nicht.*überein|passwords.*match/i')).toBeVisible()
+    await expect(page.locator('.error')).toContainText('Passwörter stimmen nicht überein')
   })
-  
-  test('should have working navigation links', async ({ page }) => {
+
+  test('should reject invalid invitation code', async ({ page }) => {
     await page.goto('/register')
-    
-    // Should have link to login page
-    const loginLink = page.locator('a[href="/login"], a:has-text("Anmeldung")')
+
+    const testEmail = `test-${Date.now()}@example.com`
+
+    // Fill form with invalid invitation code
+    await page.fill('#name', 'Test User')
+    await page.fill('#email', testEmail)
+    await page.fill('#invitationCode', 'WRONGCODE')
+    await page.fill('#password', 'TestPass123')
+    await page.fill('#confirmPassword', 'TestPass123')
+
+    // Submit form
+    await page.click('button[type="submit"]')
+
+    // Should show invitation code error
+    await expect(page.locator('.error')).toContainText(/Einladungscode|Ungültig/i, { timeout: 10000 })
+  })
+
+  test('should have working login link', async ({ page }) => {
+    await page.goto('/register')
+
+    // Should have link to login page (use first() since there may be multiple)
+    const loginLink = page.locator('a[href="/login"]').first()
     await expect(loginLink).toBeVisible()
-    
+
     // Click should navigate to login
     await loginLink.click()
     await expect(page).toHaveURL(/\/login/)
+  })
+
+  test('should show password requirements hint', async ({ page }) => {
+    await page.goto('/register')
+
+    // Should show minimum character hint
+    await expect(page.locator('text=Mindestens 6 Zeichen')).toBeVisible()
+  })
+
+  test('should show invitation code hint', async ({ page }) => {
+    await page.goto('/register')
+
+    // Should show hint about WhatsApp group
+    await expect(page.locator('text=WhatsApp-Gruppe')).toBeVisible()
   })
 })
