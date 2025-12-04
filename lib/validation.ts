@@ -134,71 +134,25 @@ export function htmlEncode(input: string): string {
 }
 
 /**
- * Validates password strength with enhanced security requirements
- * Implements comprehensive password validation with the following requirements:
- * 1. Minimum 12 characters (increased from typical 8 for better security)
- * 2. Maximum 128 characters (prevents DoS attacks)
- * 3. Must contain uppercase letters (A-Z)
- * 4. Must contain lowercase letters (a-z) 
- * 5. Must contain numbers (0-9)
- * 6. Must contain special characters (!@#$%^&* etc.)
- * 7. Rejects common patterns like repeated characters and dictionary words
- * 
+ * Validates password strength with simple requirements for hobby app
+ * Requirements:
+ * 1. Minimum 6 characters
+ * 2. Maximum 128 characters
+ *
  * @param password - The password string to validate
  * @returns object with validation result and German error message if invalid
- * @example
- * ```typescript
- * validatePassword('MySecure123!') // { isValid: true }
- * validatePassword('weak') // { isValid: false, message: 'Passwort muss mindestens 12 Zeichen lang sein' }
- * validatePassword('NoSpecialChar123') // { isValid: false, message: 'Passwort muss mindestens ein Sonderzeichen enthalten' }
- * validatePassword('password123!') // { isValid: false, message: 'Passwort enthält häufig verwendete Muster' }
- * ```
  */
 export function validatePassword(password: string): { isValid: boolean; message?: string } {
   if (!password || typeof password !== 'string') {
     return { isValid: false, message: 'Passwort ist erforderlich' }
   }
 
-  // Minimum length increased for better security
-  if (password.length < 12) {
-    return { isValid: false, message: 'Passwort muss mindestens 12 Zeichen lang sein' }
+  if (password.length < 6) {
+    return { isValid: false, message: 'Passwort muss mindestens 6 Zeichen lang sein' }
   }
 
   if (password.length > 128) {
     return { isValid: false, message: 'Passwort darf maximal 128 Zeichen lang sein' }
-  }
-
-  // Check for uppercase letter
-  if (!/[A-Z]/.test(password)) {
-    return { isValid: false, message: 'Passwort muss mindestens einen Großbuchstaben enthalten' }
-  }
-
-  // Check for lowercase letter
-  if (!/[a-z]/.test(password)) {
-    return { isValid: false, message: 'Passwort muss mindestens einen Kleinbuchstaben enthalten' }
-  }
-
-  // Check for number
-  if (!/[0-9]/.test(password)) {
-    return { isValid: false, message: 'Passwort muss mindestens eine Zahl enthalten' }
-  }
-
-  // Check for special character
-  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?`~]/.test(password)) {
-    return { isValid: false, message: 'Passwort muss mindestens ein Sonderzeichen enthalten (!@#$%^&* etc.)' }
-  }
-
-  // Check for common patterns that should be avoided
-  const commonPatterns = [
-    /(.)\1{3,}/, // Four or more consecutive identical characters
-    /123456|654321|111111|000000/, // Common number sequences
-    /qwerty|asdfgh|password|passwort/i, // Common keyboard patterns and words
-  ]
-
-  for (const pattern of commonPatterns) {
-    if (pattern.test(password)) {
-      return { isValid: false, message: 'Passwort enthält häufig verwendete Muster und ist nicht sicher' }
-    }
   }
 
   return { isValid: true }
