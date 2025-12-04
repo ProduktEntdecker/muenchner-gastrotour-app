@@ -15,21 +15,29 @@ export async function GET(request: NextRequest) {
     // Get user profile from profiles table
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('id, email, name, role')
+      .select('id, email, full_name, is_admin')
       .eq('id', authUser.id)
       .single()
 
     if (profileError) {
       console.error('Get user profile error:', profileError)
-      return NextResponse.json({ user: null })
+      // Fallback to auth user metadata if profile not found
+      return NextResponse.json({
+        user: {
+          id: authUser.id,
+          email: authUser.email,
+          name: authUser.user_metadata?.full_name || authUser.email,
+          isAdmin: false
+        }
+      })
     }
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       user: {
         id: profile.id,
-        email: profile.email,
-        name: profile.name,
-        isAdmin: profile.role === 'admin'
+        email: profile.email || authUser.email,
+        name: profile.full_name || authUser.user_metadata?.full_name || authUser.email,
+        isAdmin: profile.is_admin === true
       }
     })
   } catch (error) {
