@@ -88,6 +88,9 @@ export async function GET(request: NextRequest) {
 
     const supabase = await createClient();
 
+    // Get current user for review status
+    const { data: { user } } = await supabase.auth.getUser()
+
     // Build query for events
     let eventsQuery = supabase
       .from('events')
@@ -117,6 +120,13 @@ export async function GET(request: NextRequest) {
             id,
             full_name
           )
+        ),
+        reviews(
+          id,
+          user_id,
+          food_rating,
+          ambiance_rating,
+          service_rating
         )
       `);
 
@@ -142,11 +152,31 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Format events with seat availability
+    // Format events with seat availability and reviews
     const formattedEvents = events.map(event => {
       const confirmedBookings = event.bookings?.filter(b => b.status === 'confirmed') || [];
       const seatsTaken = confirmedBookings.length;
-      
+      const reviews = event.reviews || [];
+
+      // Calculate average ratings
+      const avgRating = reviews.length > 0 ? {
+        food: reviews.reduce((sum, r) => sum + (r.food_rating || 0), 0) / reviews.length,
+        ambiance: reviews.reduce((sum, r) => sum + (r.ambiance_rating || 0), 0) / reviews.length,
+        service: reviews.reduce((sum, r) => sum + (r.service_rating || 0), 0) / reviews.length,
+        overall: reviews.reduce((sum, r) => {
+          const avg = ((r.food_rating || 0) + (r.ambiance_rating || 0) + (r.service_rating || 0)) / 3
+          return sum + avg
+        }, 0) / reviews.length
+      } : null;
+
+      // Check if current user has attended and reviewed
+      const userBooking = user
+        ? confirmedBookings.find(b => b.user_id === user.id)
+        : null;
+      const userReview = user
+        ? reviews.find(r => r.user_id === user.id)
+        : null;
+
       return {
         id: event.id,
         name: event.name,
@@ -162,9 +192,14 @@ export async function GET(request: NextRequest) {
         seatsTaken: seatsTaken,
         cuisineType: event.cuisine_type,
         attendees: confirmedBookings.map(b => ({
-          id: (b.profiles as any)?.id || b.user_id,
-          name: (b.profiles as any)?.full_name || 'Unknown'
-        }))
+          id: (b.profiles as { id: string } | null)?.id || b.user_id,
+          name: (b.profiles as { full_name: string } | null)?.full_name || 'Unknown'
+        })),
+        // Review data
+        reviewCount: reviews.length,
+        averageRating: avgRating,
+        userAttended: !!userBooking,
+        userReviewed: !!userReview
       };
     });
 
