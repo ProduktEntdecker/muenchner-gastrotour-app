@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -17,23 +18,24 @@ export default function LoginPage() {
     setError('')
 
     try {
-      const res = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: email.trim().toLowerCase(),
-          password
-        }),
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password
       })
 
-      const data = await res.json()
-
-      if (res.ok) {
-        // Redirect to home page on successful login
-        router.push('/')
-        router.refresh()
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError('E-Mail-Adresse oder Passwort falsch')
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Bitte bestätige zuerst deine E-Mail-Adresse')
+        } else {
+          setError(error.message)
+        }
       } else {
-        setError(data.error || 'Anmeldung fehlgeschlagen')
+        // Redirect to events page on successful login
+        router.push('/events')
+        router.refresh()
       }
     } catch {
       setError('Netzwerkfehler. Bitte versuche es später erneut.')
