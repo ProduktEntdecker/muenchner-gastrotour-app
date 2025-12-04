@@ -21,7 +21,7 @@ export async function createClient() {
                 ...options,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict' as const,
+                sameSite: 'lax' as const,  // 'lax' is better for same-site navigation
                 path: '/',
               }
               cookieStore.set(name, value, enhancedOptions)
