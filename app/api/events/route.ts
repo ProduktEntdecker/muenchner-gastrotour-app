@@ -20,7 +20,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { name, description, date, address, maxSeats, cuisineType } = body;
+    const { name, description, date, address, maxSeats, cuisineType, imageUrl } = body;
 
     if (!name || !date || !address) {
       return NextResponse.json(
@@ -39,6 +39,7 @@ export async function POST(request: NextRequest) {
         address: address.trim(),
         max_seats: maxSeats || 7,
         cuisine_type: cuisineType || null,
+        image_url: imageUrl || null,
         status: 'upcoming',
         host_counts_as_seat: false
       })
@@ -94,6 +95,7 @@ export async function GET(request: NextRequest) {
         lng,
         homepage,
         menu_url,
+        image_url,
         max_seats,
         host_counts_as_seat,
         status,
@@ -144,6 +146,7 @@ export async function GET(request: NextRequest) {
         address: event.address,
         description: event.description,
         menuUrl: event.menu_url,
+        imageUrl: event.image_url,
         maxSeats: event.max_seats,
         seatsAvailable: Math.max(0, event.max_seats - seatsTaken),
         seatsTaken: seatsTaken,

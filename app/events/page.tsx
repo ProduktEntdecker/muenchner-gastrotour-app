@@ -11,6 +11,7 @@ interface Event {
   address: string
   description?: string
   menuUrl?: string
+  imageUrl?: string
   maxSeats: number
   seatsAvailable: number
   seatsTaken: number
@@ -206,14 +207,35 @@ export default function EventsPage() {
                 className="card event-card"
                 data-testid="event-card"
                 style={{
-                  padding: '28px',
+                  padding: 0,
+                  overflow: 'hidden',
                   border: event.seatsAvailable === 0
                     ? '1px solid var(--bordeaux)'
                     : '1px solid var(--messing-light)'
                 }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '24px' }}>
-                  <div style={{ flex: 1, minWidth: '280px' }}>
+                {/* Restaurant Image */}
+                {event.imageUrl && (
+                  <div style={{
+                    width: '100%',
+                    height: '200px',
+                    overflow: 'hidden',
+                    position: 'relative'
+                  }}>
+                    <img
+                      src={event.imageUrl}
+                      alt={event.name}
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </div>
+                )}
+                <div style={{ padding: '28px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', flexWrap: 'wrap', gap: '24px' }}>
+                    <div style={{ flex: 1, minWidth: '280px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '14px', marginBottom: '12px', flexWrap: 'wrap' }}>
                       <h3 data-testid="event-name" style={{
                         fontFamily: 'var(--font-display)',
@@ -348,6 +370,7 @@ export default function EventsPage() {
                       </details>
                     )}
                   </div>
+                </div>
                 </div>
               </div>
             ))}
