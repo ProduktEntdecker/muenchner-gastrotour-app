@@ -2,18 +2,18 @@ import { Resend } from 'resend'
 
 /**
  * Email Configuration for Münchner Gastrotour
- * 
+ *
  * DOMAIN STRATEGY (IMPORTANT - DON'T FORGET):
- * - Primary domain: münchner-gastrotour.de (for German market trust & SEO)
- * - Secondary domain: münchner-gastrotour.com (forwards to .de)
+ * - Primary domain: muenchner-gastrotour.de (for German market trust & SEO)
+ * - Secondary domain: muenchner-gastrotour.com (forwards to .de)
  * - Email infrastructure: Set up on .de domain only
- * 
+ *
  * CURRENT STATUS:
  * - Transactional emails: Sent via Resend from verified domain
- * - Domain in Resend: xn--mnchner-gastrotour-m6b.de (ASCII/Punycode version)
+ * - Domain in Resend: muenchner-gastrotour.de (ASCII/Punycode version)
  * - .com domain: Email forwarding active in checkdomain.de
- * 
- * DNS RECORDS REQUIRED (added to münchner-gastrotour.de at checkdomain.de):
+ *
+ * DNS RECORDS REQUIRED (added to muenchner-gastrotour.de at checkdomain.de):
  * - MX record: send -> feedback-smtp.eu-west-1.amazonses.com
  * - TXT record: send -> v=spf1 include:amazonses...
  * - TXT record: resend._domainkey -> p=MIGfMA0GCSq...
@@ -21,7 +21,7 @@ import { Resend } from 'resend'
  */
 const resend = new Resend(process.env.RESEND_API_KEY || 'test')
 
-// FROM address should be noreply@münchner-gastrotour.de once domain is verified
+// FROM address should be noreply@muenchner-gastrotour.de once domain is verified
 // Currently using Resend sandbox domain during setup
 const fromEmail = process.env.EMAIL_FROM || 'Münchner Gastrotour <onboarding@resend.dev>'
 

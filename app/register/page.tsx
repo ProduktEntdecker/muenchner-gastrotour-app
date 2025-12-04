@@ -10,6 +10,7 @@ export default function RegisterPage() {
   const [name, setName] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
+  const [invitationCode, setInvitationCode] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -34,7 +35,8 @@ export default function RegisterPage() {
         body: JSON.stringify({
           email: email.trim().toLowerCase(),
           name: name.trim(),
-          password
+          password,
+          invitationCode: invitationCode.trim()
         }),
       })
 
@@ -48,6 +50,7 @@ export default function RegisterPage() {
           setName('')
           setPassword('')
           setConfirmPassword('')
+          setInvitationCode('')
         } else {
           // Registration successful, redirect to home
           router.push('/')
@@ -135,6 +138,22 @@ export default function RegisterPage() {
             </div>
 
             <div className="form-group">
+              <label htmlFor="invitationCode">Einladungscode</label>
+              <input
+                type="text"
+                id="invitationCode"
+                className="input"
+                value={invitationCode}
+                onChange={(e) => setInvitationCode(e.target.value)}
+                required
+                placeholder="Code aus der WhatsApp-Gruppe"
+              />
+              <small style={{ color: '#666', fontSize: '12px' }}>
+                Den Code findest du in der WhatsApp-Gruppe
+              </small>
+            </div>
+
+            <div className="form-group">
               <label htmlFor="password">Passwort</label>
               <input
                 type="password"
@@ -171,7 +190,7 @@ export default function RegisterPage() {
             <button
               type="submit"
               className="btn full"
-              disabled={loading || !email.trim() || !name.trim() || !password || !confirmPassword}
+              disabled={loading || !email.trim() || !name.trim() || !password || !confirmPassword || !invitationCode.trim()}
               style={{ marginTop: '16px' }}
             >
               {loading ? 'Erstelle Account...' : 'Account erstellen'}

@@ -60,7 +60,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       )
     }
 
-    const { email, name, password } = await request.json()
+    const { email, name, password, invitationCode } = await request.json()
 
     // Validate input
     if (!email || !password || !name) {
@@ -94,6 +94,16 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       return NextResponse.json(
         { error: 'Ungültiger Name' },
         { status: 400 }
+      )
+    }
+
+    // Validate invitation code
+    const validInvitationCode = process.env.INVITATION_CODE
+
+    if (!invitationCode || invitationCode.trim() !== validInvitationCode) {
+      return NextResponse.json(
+        { error: 'Ungültiger Einladungscode. Bitte verwende den Code aus der WhatsApp-Gruppe.' },
+        { status: 403 }
       )
     }
 
