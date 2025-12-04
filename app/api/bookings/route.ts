@@ -152,12 +152,16 @@ export async function POST(request: NextRequest) {
 
     const { eventId, userEmail } = body;
 
-    if (!eventId || typeof eventId !== 'string') {
+    // Accept both string and number for eventId (DB uses integer IDs)
+    if (!eventId || (typeof eventId !== 'string' && typeof eventId !== 'number')) {
       return NextResponse.json(
         { error: 'Valid event ID is required' },
         { status: 400 }
       );
     }
+
+    // Normalize to string for consistent handling
+    const normalizedEventId = String(eventId);
 
     // For testing: support userEmail parameter and use service role client
     // For production: use authenticated user
@@ -224,7 +228,7 @@ export async function POST(request: NextRequest) {
     const { data: event, error: eventError } = await supabase
       .from('events')
       .select('*')
-      .eq('id', eventId)
+      .eq('id', normalizedEventId)
       .single();
 
     if (eventError || !event) {
@@ -246,7 +250,7 @@ export async function POST(request: NextRequest) {
     const { data: existingBooking } = await supabase
       .from('bookings')
       .select('id')
-      .eq('event_id', eventId)
+      .eq('event_id', normalizedEventId)
       .eq('user_id', userId)
       .single();
 
@@ -261,7 +265,7 @@ export async function POST(request: NextRequest) {
     const { count: confirmedCount } = await supabase
       .from('bookings')
       .select('*', { count: 'exact', head: true })
-      .eq('event_id', eventId)
+      .eq('event_id', normalizedEventId)
       .eq('status', 'confirmed');
 
     // Check if event is full
@@ -274,7 +278,7 @@ export async function POST(request: NextRequest) {
       const { count: waitlistCount } = await supabase
         .from('bookings')
         .select('*', { count: 'exact', head: true })
-        .eq('event_id', eventId)
+        .eq('event_id', normalizedEventId)
         .eq('status', 'waitlist');
       position = (waitlistCount || 0) + 1;
     }
@@ -283,7 +287,7 @@ export async function POST(request: NextRequest) {
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
-        event_id: eventId,
+        event_id: normalizedEventId,
         user_id: userId,
         status: bookingStatus,
         position
