@@ -225,6 +225,7 @@ export default function EventsPage() {
                     <img
                       src={event.imageUrl}
                       alt={event.name}
+                      loading="lazy"
                       style={{
                         width: '100%',
                         height: '100%',

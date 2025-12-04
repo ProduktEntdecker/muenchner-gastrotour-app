@@ -22,6 +22,12 @@ export async function POST(request: NextRequest) {
 
     const { name, description, date, address, maxSeats, cuisineType, imageUrl } = body;
 
+    // Normalize imageUrl - trim and validate non-empty string
+    const normalizedImageUrl =
+      typeof imageUrl === 'string' && imageUrl.trim()
+        ? imageUrl.trim()
+        : null;
+
     if (!name || !date || !address) {
       return NextResponse.json(
         { error: 'Missing required fields: name, date, address' },
@@ -39,7 +45,7 @@ export async function POST(request: NextRequest) {
         address: address.trim(),
         max_seats: maxSeats || 7,
         cuisine_type: cuisineType || null,
-        image_url: imageUrl || null,
+        image_url: normalizedImageUrl,
         status: 'upcoming',
         host_counts_as_seat: false
       })
