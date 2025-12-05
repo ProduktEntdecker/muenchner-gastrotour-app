@@ -4,10 +4,22 @@
  */
 
 /**
+ * Get the Supabase project reference from the URL
+ * Used to construct the correct cookie names
+ */
+function getSupabaseProjectRef(): string {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  // Extract project ref from URL like https://ppypwhnxgphraleorioq.supabase.co
+  const match = url.match(/https:\/\/([^.]+)\.supabase\.co/)
+  return match ? match[1] : ''
+}
+
+/**
  * Cookie names used for authentication
- * These should be used consistently across all auth-related code
+ * Supabase uses cookies in the format: sb-<project-ref>-auth-token
  */
 export const AUTH_COOKIE_NAMES = {
+  // Legacy names (kept for backwards compatibility during transition)
   ACCESS_TOKEN: 'sb-access-token',
   REFRESH_TOKEN: 'sb-refresh-token',
   AUTH_TOKEN: 'sb-auth-token',
@@ -15,8 +27,24 @@ export const AUTH_COOKIE_NAMES = {
 } as const
 
 /**
+ * Get all auth cookie names including the Supabase project-specific ones
+ */
+export function getAllAuthCookieNames(): string[] {
+  const projectRef = getSupabaseProjectRef()
+  const supabaseCookies = projectRef ? [
+    `sb-${projectRef}-auth-token`,
+    `sb-${projectRef}-auth-token-code-verifier`,
+  ] : []
+
+  return [
+    ...Object.values(AUTH_COOKIE_NAMES),
+    ...supabaseCookies,
+  ]
+}
+
+/**
  * Array of all auth cookie names for bulk operations
- * Used when clearing all auth cookies on logout
+ * @deprecated Use getAllAuthCookieNames() instead for proper Supabase cookie handling
  */
 export const ALL_AUTH_COOKIES = Object.values(AUTH_COOKIE_NAMES)
 
