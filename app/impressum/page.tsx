@@ -1,4 +1,20 @@
+/**
+ * Impressum page - Server Component
+ * Contact details are loaded from environment variables to avoid
+ * committing personal data to the repository.
+ */
+
+// Server-only: These values are never serialized to client JS
+const getImpressumData = () => ({
+  name: process.env.IMPRESSUM_NAME || '[Name nicht konfiguriert]',
+  street: process.env.IMPRESSUM_STREET || '[Straße nicht konfiguriert]',
+  city: process.env.IMPRESSUM_CITY || '[Stadt nicht konfiguriert]',
+  email: process.env.IMPRESSUM_EMAIL || 'info@muenchner-gastrotour.de',
+})
+
 export default function ImpressumPage(): JSX.Element {
+  const contact = getImpressumData()
+
   return (
     <div className="container py-16 px-5 max-w-3xl mx-auto">
       <div className="section-header mb-10">
@@ -10,22 +26,22 @@ export default function ImpressumPage(): JSX.Element {
       <div className="leading-relaxed text-[var(--ink)]">
         <h2 className="mb-4 text-xl font-semibold">Angaben gemäß § 5 TMG</h2>
         <p className="mb-6">
-          Dr. Florian Steiner<br />
-          St.-Ingbert-Str. 9<br />
-          81541 München<br />
+          {contact.name}<br />
+          {contact.street}<br />
+          {contact.city}<br />
           Deutschland
         </p>
 
         <h2 className="mb-4 text-xl font-semibold">Kontakt</h2>
         <p className="mb-6">
-          E-Mail: <a href="mailto:info@muenchner-gastrotour.de">info@muenchner-gastrotour.de</a>
+          E-Mail: <a href={`mailto:${contact.email}`}>{contact.email}</a>
         </p>
 
         <h2 className="mb-4 text-xl font-semibold">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
         <p className="mb-6">
-          Dr. Florian Steiner<br />
-          St.-Ingbert-Str. 9<br />
-          81541 München
+          {contact.name}<br />
+          {contact.street}<br />
+          {contact.city}
         </p>
 
         <h2 className="mb-4 text-xl font-semibold">Haftungsausschluss</h2>
