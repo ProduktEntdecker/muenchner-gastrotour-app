@@ -111,9 +111,19 @@ export async function GET(request: NextRequest) {
 
 // POST /api/bookings - Create new booking
 export async function POST(request: NextRequest) {
+  // Declare at function level so it's accessible in catch block
+  let userEmailAddress: string | undefined;
+
   try {
     // Apply rate limiting
-    await applyRateLimit(RATE_LIMITS.bookingsCreate, request);
+    const rateLimit = await applyRateLimit(request, RATE_LIMITS.API_BOOKING, 'booking');
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: rateLimit.error },
+        { status: 429, headers: rateLimit.headers }
+      );
+    }
 
     // CSRF protection: validate origin using explicit preconfigured origins
     const origin = request.headers.get('origin');
@@ -166,7 +176,6 @@ export async function POST(request: NextRequest) {
     // For testing: support userEmail parameter and use service role client
     // For production: use authenticated user
     let userId: string;
-    let userEmailAddress: string;
     let supabase: any;
 
     if (userEmail) {
@@ -300,9 +309,43 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (bookingError) {
-      console.error('Error creating booking:', bookingError);
+      // Log to Supabase error_logs table for persistence
+      await SimpleErrorTracker.logError(
+        new Error(`Booking creation failed: ${bookingError.message}`),
+        {
+          component: 'API_BOOKING_POST',
+          userEmail: userEmailAddress,
+          additionalData: {
+            userId,
+            eventId: normalizedEventId,
+            bookingStatus,
+            position,
+            errorCode: bookingError.code,
+            errorDetails: bookingError.details,
+            errorHint: bookingError.hint,
+            fullError: bookingError
+          }
+        }
+      );
+
+      // Return more specific error messages based on error type
+      let errorMessage = 'Failed to create booking';
+
+      if (bookingError.code === '23505') {
+        // Unique constraint violation
+        errorMessage = 'You have already booked this event';
+      } else if (bookingError.code === '23503') {
+        // Foreign key constraint violation
+        errorMessage = 'Invalid event or user reference';
+      } else if (bookingError.message?.includes('permission')) {
+        errorMessage = 'Permission denied. Please try logging out and back in.';
+      }
+
       return NextResponse.json(
-        { error: 'Failed to create booking' },
+        {
+          error: errorMessage,
+          details: process.env.NODE_ENV === 'development' ? bookingError.message : undefined
+        },
         { status: 500 }
       );
     }
@@ -326,7 +369,7 @@ export async function POST(request: NextRequest) {
     if (!userEmail) {
       try {
         await sendBookingConfirmation(
-          userEmailAddress,
+          userEmailAddress || '',
           booking.profiles?.full_name || 'Guest',
           booking.events?.name || '',
           booking.events?.date || '',
@@ -346,7 +389,17 @@ export async function POST(request: NextRequest) {
         : 'Booking confirmed successfully'
     }, { status: 201 });
   } catch (error) {
-    console.error('Error creating booking:', error);
+    // Log to Supabase error_logs table for persistence
+    await SimpleErrorTracker.logError(
+      error as Error,
+      {
+        component: 'API_BOOKING_POST',
+        userEmail: userEmailAddress,
+        additionalData: {
+          timestamp: new Date().toISOString()
+        }
+      }
+    );
 
     // Handle database constraint errors
     if (error instanceof Error) {
@@ -362,10 +415,19 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      if (error.message.includes('permission') || error.message.includes('RLS')) {
+        return NextResponse.json(
+          { error: 'Permission denied. Please try logging out and back in.' },
+          { status: 403 }
+        );
+      }
     }
 
     return NextResponse.json(
-      { error: 'Failed to create booking' },
+      {
+        error: 'Failed to create booking',
+        details: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
+      },
       { status: 500 }
     );
   }

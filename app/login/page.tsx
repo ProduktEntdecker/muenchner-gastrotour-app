@@ -39,6 +39,8 @@ export default function LoginPage() {
           setError('E-Mail-Adresse oder Passwort falsch')
         } else if (error.message.includes('Email not confirmed')) {
           setError('Bitte bestätige zuerst deine E-Mail-Adresse')
+        } else if (error.message.includes('Load failed') || error.message.includes('Failed to fetch')) {
+          setError('Verbindungsfehler. Bitte prüfe deine Internetverbindung oder deaktiviere Content-Blocker.')
         } else {
           setError(error.message)
         }
@@ -46,8 +48,14 @@ export default function LoginPage() {
         // Hard redirect to ensure cookies are sent and NavBar refreshes
         window.location.href = '/events'
       }
-    } catch {
-      setError('Netzwerkfehler. Bitte versuche es später erneut.')
+    } catch (err) {
+      // Handle network errors that don't come from Supabase
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+      if (errorMessage.includes('Load failed') || errorMessage.includes('Failed to fetch')) {
+        setError('Verbindungsfehler. Bitte prüfe deine Internetverbindung oder deaktiviere Content-Blocker.')
+      } else {
+        setError('Netzwerkfehler. Bitte versuche es später erneut.')
+      }
     } finally {
       setLoading(false)
     }

@@ -17,6 +17,7 @@ export async function createClient() {
           try {
             cookiesToSet.forEach(({ name, value, options }) => {
               // Enhanced cookie security settings with 30-day persistence
+              // Using sameSite: 'lax' for better Safari/cross-browser compatibility
               const enhancedOptions = {
                 ...options,
                 httpOnly: true,
