@@ -111,6 +111,9 @@ export async function GET(request: NextRequest) {
 
 // POST /api/bookings - Create new booking
 export async function POST(request: NextRequest) {
+  // Declare at function level so it's accessible in catch block
+  let userEmailAddress: string | undefined;
+
   try {
     // Apply rate limiting
     const rateLimit = await applyRateLimit(request, RATE_LIMITS.API_BOOKING, 'booking');
@@ -173,7 +176,6 @@ export async function POST(request: NextRequest) {
     // For testing: support userEmail parameter and use service role client
     // For production: use authenticated user
     let userId: string;
-    let userEmailAddress: string;
     let supabase: any;
 
     if (userEmail) {
@@ -307,21 +309,24 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (bookingError) {
-      // Enhanced error logging with full context
-      console.error('❌ BOOKING CREATION FAILED:', {
-        userId,
-        userEmail: userEmailAddress,
-        eventId: normalizedEventId,
-        bookingStatus,
-        position,
-        error: {
-          code: bookingError.code,
-          message: bookingError.message,
-          details: bookingError.details,
-          hint: bookingError.hint,
-          full: bookingError
+      // Log to Supabase error_logs table for persistence
+      await SimpleErrorTracker.logError(
+        new Error(`Booking creation failed: ${bookingError.message}`),
+        {
+          component: 'API_BOOKING_POST',
+          userEmail: userEmailAddress,
+          additionalData: {
+            userId,
+            eventId: normalizedEventId,
+            bookingStatus,
+            position,
+            errorCode: bookingError.code,
+            errorDetails: bookingError.details,
+            errorHint: bookingError.hint,
+            fullError: bookingError
+          }
         }
-      });
+      );
 
       // Return more specific error messages based on error type
       let errorMessage = 'Failed to create booking';
@@ -364,7 +369,7 @@ export async function POST(request: NextRequest) {
     if (!userEmail) {
       try {
         await sendBookingConfirmation(
-          userEmailAddress,
+          userEmailAddress || '',
           booking.profiles?.full_name || 'Guest',
           booking.events?.name || '',
           booking.events?.date || '',
@@ -384,15 +389,17 @@ export async function POST(request: NextRequest) {
         : 'Booking confirmed successfully'
     }, { status: 201 });
   } catch (error) {
-    // Enhanced error logging with full context
-    console.error('❌ BOOKING API ERROR (CATCH BLOCK):', {
-      error: error instanceof Error ? {
-        name: error.name,
-        message: error.message,
-        stack: error.stack
-      } : error,
-      timestamp: new Date().toISOString()
-    });
+    // Log to Supabase error_logs table for persistence
+    await SimpleErrorTracker.logError(
+      error as Error,
+      {
+        component: 'API_BOOKING_POST',
+        userEmail: userEmailAddress,
+        additionalData: {
+          timestamp: new Date().toISOString()
+        }
+      }
+    );
 
     // Handle database constraint errors
     if (error instanceof Error) {
