@@ -28,7 +28,7 @@ export const AUTH_COOKIE_CONFIG = {
   path: '/',
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
+  sameSite: 'lax' as const, // 'lax' for Safari compatibility (consistent with server.ts)
   maxAge: 30 * 24 * 60 * 60, // 30 days in seconds
 }
 

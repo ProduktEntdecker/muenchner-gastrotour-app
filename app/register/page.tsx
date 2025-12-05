@@ -11,6 +11,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [invitationCode, setInvitationCode] = useState('')
+  const [privacyAccepted, setPrivacyAccepted] = useState(false)
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
   const [error, setError] = useState('')
@@ -184,13 +185,31 @@ export default function RegisterPage() {
               />
             </div>
 
+            <div className="form-group" style={{ marginTop: '16px' }}>
+              <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer', fontSize: '14px' }}>
+                <input
+                  type="checkbox"
+                  checked={privacyAccepted}
+                  onChange={(e) => setPrivacyAccepted(e.target.checked)}
+                  style={{ marginTop: '3px', width: '18px', height: '18px', flexShrink: 0 }}
+                />
+                <span>
+                  Ich habe die{' '}
+                  <Link href="/datenschutz" target="_blank" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
+                    Datenschutzerklärung
+                  </Link>{' '}
+                  gelesen und akzeptiere die Verarbeitung meiner Daten.
+                </span>
+              </label>
+            </div>
+
             {error && <div className="error" role="alert" aria-live="assertive">{error}</div>}
             {message && <div className="success" role="status" aria-live="polite">{message}</div>}
 
             <button
               type="submit"
               className="btn full"
-              disabled={loading || !email.trim() || !name.trim() || !password || !confirmPassword || !invitationCode.trim()}
+              disabled={loading || !email.trim() || !name.trim() || !password || !confirmPassword || !invitationCode.trim() || !privacyAccepted}
               style={{ marginTop: '16px' }}
             >
               {loading ? 'Erstelle Account...' : 'Account erstellen'}

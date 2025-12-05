@@ -24,10 +24,17 @@ export default function DatenschutzPage(): JSX.Element {
           können Sie dem Impressum dieser Website entnehmen.
         </p>
 
-        <h2 className="mb-4 text-xl font-semibold">2. Hosting</h2>
+        <h2 className="mb-4 text-xl font-semibold">2. Hosting und Auftragsverarbeiter</h2>
+        <p className="mb-4">
+          Für den Betrieb dieser Website nutzen wir folgende Dienstleister:
+        </p>
+        <ul className="mb-6 list-disc pl-6 space-y-2">
+          <li><strong>Vercel Inc.</strong> (Hosting) – 440 N Barranca Ave #4133, Covina, CA 91723, USA</li>
+          <li><strong>Supabase Inc.</strong> (Datenbank, Authentifizierung) – Server in Dublin, Irland (EU)</li>
+          <li><strong>Resend Inc.</strong> (E-Mail-Versand) – San Francisco, CA, USA</li>
+        </ul>
         <p className="mb-6">
-          Wir hosten die Inhalte unserer Website bei Vercel Inc. Anbieter ist die Vercel Inc.,
-          440 N Barranca Ave #4133, Covina, CA 91723, USA.
+          Für die Übermittlung in die USA bestehen Standardvertragsklauseln (SCCs) gemäß Art. 46 DSGVO.
         </p>
 
         <h2 className="mb-4 text-xl font-semibold">3. Allgemeine Hinweise und Pflichtinformationen</h2>
@@ -59,6 +66,27 @@ export default function DatenschutzPage(): JSX.Element {
           Wir speichern: E-Mail-Adresse, Name, Buchungsdaten für Events.
         </p>
 
+        <h3 className="mb-3 text-lg text-[var(--ink-soft)]">Rechtsgrundlage der Verarbeitung</h3>
+        <p className="mb-4">
+          Die Verarbeitung Ihrer Daten erfolgt auf folgenden Rechtsgrundlagen (Art. 6 DSGVO):
+        </p>
+        <ul className="mb-6 list-disc pl-6 space-y-2">
+          <li><strong>Registrierung & Profildaten:</strong> Vertragserfüllung (Art. 6 Abs. 1 lit. b) – zur Nutzung der Plattform</li>
+          <li><strong>Buchungsdaten:</strong> Vertragserfüllung (Art. 6 Abs. 1 lit. b) – zur Teilnahme an Events</li>
+          <li><strong>E-Mail-Benachrichtigungen:</strong> Vertragserfüllung (Art. 6 Abs. 1 lit. b) – Buchungsbestätigungen und Event-Erinnerungen</li>
+          <li><strong>Technische Cookies:</strong> Berechtigtes Interesse (Art. 6 Abs. 1 lit. f) – zur Authentifizierung</li>
+        </ul>
+
+        <h3 className="mb-3 text-lg text-[var(--ink-soft)]">Speicherdauer</h3>
+        <p className="mb-4">
+          Wir speichern Ihre Daten nur so lange, wie es für die jeweiligen Zwecke erforderlich ist:
+        </p>
+        <ul className="mb-6 list-disc pl-6 space-y-2">
+          <li><strong>Account-Daten:</strong> Bis zur Löschung Ihres Accounts</li>
+          <li><strong>Buchungsdaten:</strong> Bis 1 Jahr nach dem Event-Datum</li>
+          <li><strong>Session-Cookies:</strong> Maximal 30 Tage</li>
+        </ul>
+
         <h2 className="mb-4 text-xl font-semibold">5. E-Mail-Versand</h2>
         <p className="mb-6">
           Für den Versand von E-Mails (z.B. Buchungsbestätigungen) nutzen wir den Dienst Resend.
@@ -67,11 +95,23 @@ export default function DatenschutzPage(): JSX.Element {
         </p>
 
         <h2 className="mb-4 text-xl font-semibold">6. Ihre Rechte</h2>
-        <p className="mb-6">
+        <p className="mb-4">
           Sie haben jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen
           Daten, deren Herkunft und Empfänger und den Zweck der Datenverarbeitung sowie ein Recht auf
           Berichtigung oder Löschung dieser Daten. Hierzu sowie zu weiteren Fragen zum Thema Datenschutz
           können Sie sich jederzeit an uns wenden.
+        </p>
+        <p className="mb-4">
+          <strong>Beschwerderecht bei der Aufsichtsbehörde:</strong><br />
+          Sie haben das Recht, sich bei einer Datenschutz-Aufsichtsbehörde zu beschweren. Die für uns
+          zuständige Aufsichtsbehörde ist:
+        </p>
+        <p className="mb-6">
+          Bayerisches Landesamt für Datenschutzaufsicht (BayLDA)<br />
+          Promenade 18, 91522 Ansbach<br />
+          <a href="https://www.lda.bayern.de" target="_blank" rel="noopener noreferrer" style={{ color: 'var(--primary)' }}>
+            www.lda.bayern.de
+          </a>
         </p>
 
         <div className="mt-10 p-5 bg-[var(--paper-warm)] rounded-lg border border-[var(--line)]">

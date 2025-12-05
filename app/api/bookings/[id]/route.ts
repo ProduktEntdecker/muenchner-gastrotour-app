@@ -8,17 +8,24 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Try to get authenticated user first
-    let supabaseAuth = await createClient();
-    const { data: { user } } = await supabaseAuth.auth.getUser();
+    // Require authenticated user
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // If no auth, use service role client for testing
-    const supabase = user ? supabaseAuth : createServiceRoleClient();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
     const bookingId = params.id;
 
+    // Use service role client for database operations (to handle RLS)
+    const serviceClient = createServiceRoleClient();
+
     // Get booking with event details
-    const { data: booking, error: bookingError } = await supabase
+    const { data: booking, error: bookingError } = await serviceClient
       .from('bookings')
       .select(`
         *,
@@ -34,8 +41,8 @@ export async function DELETE(
       );
     }
 
-    // Check ownership (skip in test mode when user is null)
-    if (user && booking.user_id !== user.id) {
+    // Check ownership - user can only cancel their own bookings
+    if (booking.user_id !== user.id) {
       return NextResponse.json(
         { error: 'You can only cancel your own bookings' },
         { status: 403 }
@@ -51,7 +58,7 @@ export async function DELETE(
     }
 
     // Update booking status to cancelled (don't delete)
-    const { data: cancelledBooking, error: cancelError } = await supabase
+    const { data: cancelledBooking, error: cancelError } = await serviceClient
       .from('bookings')
       .update({ status: 'cancelled', position: null })
       .eq('id', bookingId)
@@ -69,7 +76,7 @@ export async function DELETE(
     // If booking was confirmed, check for waitlist promotions
     if (booking.status === 'confirmed') {
       // Get next person on waitlist
-      const { data: nextWaitlist } = await supabase
+      const { data: nextWaitlist } = await serviceClient
         .from('bookings')
         .select(`
           *,
@@ -83,7 +90,7 @@ export async function DELETE(
 
       if (nextWaitlist) {
         // Promote from waitlist to confirmed
-        const { error: updateError } = await supabase
+        const { error: updateError } = await serviceClient
           .from('bookings')
           .update({
             status: 'confirmed',
@@ -93,9 +100,9 @@ export async function DELETE(
 
         if (!updateError) {
           // Update remaining waitlist positions
-          await supabase.rpc('update_waitlist_positions', {
+          await serviceClient.rpc('update_waitlist_positions', {
             p_event_id: booking.event_id
-          }).catch(err => {
+          }).catch(() => {
             // If the RPC doesn't exist, manually update positions
             console.log('Waitlist position update skipped');
           });
@@ -147,17 +154,24 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    // Try to get authenticated user first
-    let supabaseAuth = await createClient();
-    const { data: { user } } = await supabaseAuth.auth.getUser();
+    // Require authenticated user
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
 
-    // If no auth, use service role client for testing
-    const supabase = user ? supabaseAuth : createServiceRoleClient();
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Unauthorized' },
+        { status: 401 }
+      );
+    }
 
     const bookingId = params.id;
 
+    // Use service role client for database operations (to handle RLS)
+    const serviceClient = createServiceRoleClient();
+
     // Get booking with event details
-    const { data: booking, error } = await supabase
+    const { data: booking, error } = await serviceClient
       .from('bookings')
       .select(`
         *,
@@ -174,9 +188,8 @@ export async function GET(
       );
     }
 
-    // Check ownership (unless user is admin - could add admin check here)
-    // Skip ownership check for test mode (when no authenticated user)
-    if (user && booking.user_id !== user.id) {
+    // Check ownership - user can only view their own bookings
+    if (booking.user_id !== user.id) {
       return NextResponse.json(
         { error: 'You can only view your own bookings' },
         { status: 403 }
