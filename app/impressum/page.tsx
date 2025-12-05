@@ -10,9 +10,9 @@ export default function ImpressumPage(): JSX.Element {
       <div className="leading-relaxed text-[var(--ink)]">
         <h2 className="mb-4 text-xl font-semibold">Angaben gemäß § 5 TMG</h2>
         <p className="mb-6">
-          Florian Steiner<br />
-          [Straße und Hausnummer]<br />
-          [PLZ] München<br />
+          Dr. Florian Steiner<br />
+          St.-Ingbert-Str. 9<br />
+          81541 München<br />
           Deutschland
         </p>
 
@@ -23,9 +23,9 @@ export default function ImpressumPage(): JSX.Element {
 
         <h2 className="mb-4 text-xl font-semibold">Verantwortlich für den Inhalt nach § 55 Abs. 2 RStV</h2>
         <p className="mb-6">
-          Florian Steiner<br />
-          [Straße und Hausnummer]<br />
-          [PLZ] München
+          Dr. Florian Steiner<br />
+          St.-Ingbert-Str. 9<br />
+          81541 München
         </p>
 
         <h2 className="mb-4 text-xl font-semibold">Haftungsausschluss</h2>
