@@ -113,7 +113,14 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Apply rate limiting
-    await applyRateLimit(RATE_LIMITS.bookingsCreate, request);
+    const rateLimit = await applyRateLimit(request, RATE_LIMITS.API_BOOKING, 'booking');
+
+    if (!rateLimit.success) {
+      return NextResponse.json(
+        { error: rateLimit.error },
+        { status: 429, headers: rateLimit.headers }
+      );
+    }
 
     // CSRF protection: validate origin using explicit preconfigured origins
     const origin = request.headers.get('origin');
@@ -300,9 +307,40 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (bookingError) {
-      console.error('Error creating booking:', bookingError);
+      // Enhanced error logging with full context
+      console.error('❌ BOOKING CREATION FAILED:', {
+        userId,
+        userEmail: userEmailAddress,
+        eventId: normalizedEventId,
+        bookingStatus,
+        position,
+        error: {
+          code: bookingError.code,
+          message: bookingError.message,
+          details: bookingError.details,
+          hint: bookingError.hint,
+          full: bookingError
+        }
+      });
+
+      // Return more specific error messages based on error type
+      let errorMessage = 'Failed to create booking';
+
+      if (bookingError.code === '23505') {
+        // Unique constraint violation
+        errorMessage = 'You have already booked this event';
+      } else if (bookingError.code === '23503') {
+        // Foreign key constraint violation
+        errorMessage = 'Invalid event or user reference';
+      } else if (bookingError.message?.includes('permission')) {
+        errorMessage = 'Permission denied. Please try logging out and back in.';
+      }
+
       return NextResponse.json(
-        { error: 'Failed to create booking' },
+        {
+          error: errorMessage,
+          details: process.env.NODE_ENV === 'development' ? bookingError.message : undefined
+        },
         { status: 500 }
       );
     }
@@ -346,7 +384,15 @@ export async function POST(request: NextRequest) {
         : 'Booking confirmed successfully'
     }, { status: 201 });
   } catch (error) {
-    console.error('Error creating booking:', error);
+    // Enhanced error logging with full context
+    console.error('❌ BOOKING API ERROR (CATCH BLOCK):', {
+      error: error instanceof Error ? {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      } : error,
+      timestamp: new Date().toISOString()
+    });
 
     // Handle database constraint errors
     if (error instanceof Error) {
@@ -362,10 +408,19 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
+      if (error.message.includes('permission') || error.message.includes('RLS')) {
+        return NextResponse.json(
+          { error: 'Permission denied. Please try logging out and back in.' },
+          { status: 403 }
+        );
+      }
     }
 
     return NextResponse.json(
-      { error: 'Failed to create booking' },
+      {
+        error: 'Failed to create booking',
+        details: process.env.NODE_ENV === 'development' && error instanceof Error ? error.message : undefined
+      },
       { status: 500 }
     );
   }
